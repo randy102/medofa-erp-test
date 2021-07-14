@@ -23,6 +23,7 @@ module.exports = (on, config) => {
   config.env.erpUsername = process.env.ERP_USER
   config.env.erpPassword = process.env.ERP_PASSWORD
   config.env.erpDB = process.env.ERP_DB
-  config.env.erpPort = process.env.ERP_PORT
+  config.env.erpPort = +process.env.ERP_PORT
+  config.env.erpPartnerId = +process.env.PARTNER_ID
   return config
 }

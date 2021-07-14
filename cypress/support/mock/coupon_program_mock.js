@@ -27,8 +27,4 @@ export default class CouponProgramMock extends BaseMock {
     }
     return super._generate(val)
   }
-
-  cleanup() {
-    super.cleanup()
-  }
 }

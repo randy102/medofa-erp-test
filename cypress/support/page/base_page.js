@@ -4,11 +4,17 @@ export default class BasePage{
   init(){
     login()
     cy.visit('/')
+    this.navigate(true)
+  }
+
+  navigate(isLoggedIn = false){
+    if(!isLoggedIn) login()
   }
 
   clickRootMenu(id){
     cy.get('a.full[data-display="static"]').click()
     this.clickMenu(id)
+    cy.wait(2000)
   }
 
   clickMenu(id){

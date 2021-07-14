@@ -8,7 +8,7 @@ export default class OdooRPC {
     console.log('-----------Create OdooRPC instance-------------')
     this.odoo = new Odoo({
       url: Cypress.config('baseUrl'),
-      port: +Cypress.env('erpPort'),
+      port: Cypress.env('erpPort'),
       db: Cypress.env('erpDB'),
       username: Cypress.env('erpUsername'),
       password: Cypress.env('erpPassword')
@@ -26,6 +26,10 @@ export default class OdooRPC {
     return this.call(model, 'create', val)
   }
 
+  read(model, id, fields=false){
+    return this.call(model, 'read', [+id], fields)
+  }
+
   write(model, id, val) {
     return this.call(model, 'write', [id], val)
   }
@@ -34,21 +38,25 @@ export default class OdooRPC {
     return this.write(model, id, {'active': false})
   }
 
+  unlink(model, id) {
+    return this.call(model, 'unlink', id)
+  }
+
   call(model, method, ...params) {
-    console.log(params)
     const odooInstance = this.odoo
-    return new Cypress.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       odooInstance.connect(function (err) {
         if (err) {
-          console.log({err})
+          console.log(model, method, params, {err})
           reject(err)
         }
         odooInstance.execute_kw(model, method, [params], function (err, value) {
           if (err) {
-            console.log({err})
+            console.log(model, method, params, {err})
             reject(err)
           }
           resolve(value)
+          console.log(model, method, params, {value})
         });
       });
     })
