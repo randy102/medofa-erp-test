@@ -13,7 +13,7 @@ const salePage = new SaleOrderPage()
 
 describe('Generate coupon with length and prefix', function () {
   before(() => {
-    couponProgramMock.with_cy(couponProgramMock.generate, programName)
+    couponProgramMock.with_cy(() => couponProgramMock.generate({ name: programName }))
     page.navigate()
   })
 
@@ -44,19 +44,22 @@ describe('Generate coupon with length and prefix', function () {
     page.generateCoupon('5', prefix, '1')
     page.getNumberOfCoupon().should('contain', '6')
 
-    page.clickButton('Generate Coupon')
-    page.generateCoupon('6', prefix, '1')
-    cy.contains(exceededCouponError).should('be.visible')
-    page.clickButton('Ok')
+    for(let currentCoupon = 7; currentCoupon <= 11; currentCoupon++){
+      page.clickButton('Generate Coupon')
+      page.generateCoupon('6', prefix, '1')
+      cy.contains(exceededCouponError).should('be.visible')
+      page.clickButton('Ok')
 
-    page.generateCoupon('5', prefix, '1')
-    page.getNumberOfCoupon().should('contain', '11')
+      page.generateCoupon('1', prefix, '1')
+      page.getNumberOfCoupon().should('contain', currentCoupon.toString())
+    }
+
   });
 
   it('should apply code to sale order successfully', function () {
-    saleOrderMock.with_cy(saleOrderMock.generate)
+    saleOrderMock.with_cy(() => saleOrderMock.generate({}))
     salePage.navigate()
-    saleOrderMock.with_cy(saleOrderMock._get, ['name']).then(data => {
+    saleOrderMock.with_cy(() => saleOrderMock.get(['name'])).then(data => {
       salePage.clickTreeItem(data['name'])
       salePage.clickButton('Coupon')
       salePage.input('coupon_code', this['coupon_code'])

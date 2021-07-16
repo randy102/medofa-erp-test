@@ -1,8 +1,13 @@
 import BaseMock from './base_mock'
 import ProductMock from './product_mock'
-import random from '../utils/random'
+import { MockItem } from './mock_item';
 
-export default class SaleOrderMock extends BaseMock {
+class GenerateConfig{
+  productMock?: ProductMock
+  price?: number
+}
+
+export default class SaleOrderMock extends BaseMock implements MockItem{
   MODEL = 'sale.order'
   private productMock: ProductMock
 
@@ -10,14 +15,14 @@ export default class SaleOrderMock extends BaseMock {
     super(true)
   }
 
-  async generate(productMock=null, price=10000) {
+  async generate({ productMock = null, price = 10000 }: GenerateConfig) {
     if(productMock){
       this.productMock = productMock
     } else{
       this.productMock = new ProductMock()
-      await this.productMock.generate(random(), price)
+      await this.productMock.generate({price})
     }
-    const productData = await this.productMock._get(['product_variant_id','display_name','uom_id'])
+    const productData = await this.productMock.get(['product_variant_id','display_name','uom_id'])
     const val = {
       "picking_policy": "direct",
       "partner_id": Cypress.env('erpPartnerId'),

@@ -22,11 +22,11 @@ export default class OdooRPC {
     return this.instance
   }
 
-  create(model, val): Promise<any> {
+  create(model, val): Promise<number> {
     return this.call(model, 'create', val)
   }
 
-  read(model, id, fields = false): Promise<any> {
+  read(model, id, fields: string[] = []): Promise<any> {
     return this.call(model, 'read', [+id], fields)
   }
 

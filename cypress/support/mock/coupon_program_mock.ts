@@ -1,13 +1,19 @@
 import BaseMock from './base_mock'
+import { MockItem } from './mock_item';
+import random from '../utils/random';
 
-export default class CouponProgramMock extends BaseMock {
+class GenerateConfig{
+  name?: string
+}
+
+export default class CouponProgramMock extends BaseMock implements MockItem{
   MODEL = 'sale.coupon.program'
 
   constructor() {
     super()
   }
 
-  generate(name) {
+  generate({ name = random() }: GenerateConfig) {
     const val = {
       "active": true,
       "program_type": "coupon_program",

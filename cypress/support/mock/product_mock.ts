@@ -1,16 +1,24 @@
 import BaseMock from './base_mock'
+import random from '../utils/random';
+import { MockItem } from './mock_item';
 
-export default class ProductMock extends BaseMock{
+class GenerateConfig {
+  name?: string
+  price?: number
+}
+
+export default class ProductMock extends BaseMock implements MockItem {
   MODEL = 'product.template'
 
   constructor() {
     super(true);
   }
 
-  generate(name, sale_price=10000){
+  generate({ name = random(), price = 10000 }: GenerateConfig) {
+    console.log({ name, price })
     const val = {
       name,
-      list_price: sale_price
+      list_price: price
     }
     return super._generate(val)
   }
