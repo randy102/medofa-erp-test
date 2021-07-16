@@ -1,20 +1,21 @@
 import OdooRPC from '../utils/OdooRPC'
 
 export default class BaseMock {
-  id
-  rpc
-  MODEL
-  canDelete
+  id: number
+  rpc: OdooRPC
+  MODEL: string
+  canDelete: boolean
 
   constructor(canDelete = false) {
     this.rpc = OdooRPC.getInstance()
     this.canDelete = canDelete
   }
 
-  cleanup() {
+  async cleanup() {
     if (this.canDelete)
-      return this.rpc.unlink(this.MODEL, this.id)
-    return this.rpc.archive(this.MODEL, this.id)
+       await this.rpc.unlink(this.MODEL, this.id)
+    else
+      await this.rpc.archive(this.MODEL, this.id)
   }
 
   async _get(fields) {

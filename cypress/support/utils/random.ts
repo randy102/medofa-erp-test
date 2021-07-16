@@ -1,4 +1,4 @@
-export default function (length = 8) {
+export default function (length = 8){
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;

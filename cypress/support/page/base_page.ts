@@ -1,52 +1,47 @@
 import login from '../utils/login'
 
-export default class BasePage{
-  init(){
+export default class BasePage {
+  navigate() {
     login()
     cy.visit('/')
-    this.navigate(true)
   }
 
-  navigate(isLoggedIn = false){
-    if(!isLoggedIn) login()
-  }
-
-  clickRootMenu(id){
+  clickRootMenu(id) {
     cy.get('a.full[data-display="static"]').click()
     this.clickMenu(id)
     cy.wait(2000)
   }
 
-  clickMenu(id){
+  clickMenu(id) {
     cy.get(`a[data-menu-xmlid="${id}"]`).click()
   }
 
-  clickTreeItem(name){
+  clickTreeItem(name) {
     cy.get('.o_data_row').contains(name).as(name).should('exist')
     cy.get(`@${name}`).scrollIntoView().click()
   }
 
-  clickButton(name){
+  clickButton(name) {
     cy.contains(new RegExp("^" + name + "$", "g")).scrollIntoView().click()
   }
 
-  input(name, content){
+  input(name, content) {
     cy.get(`input[name="${name}"]`).scrollIntoView().clear().type(content)
   }
 
-  getFirstRow(){
+  getFirstRow() {
     return cy.get('tr.o_data_row')
   }
 
-  getRow(num){
-    return cy.get('tr.o_data_row').eq(num-1)
+  getRow(num) {
+    return cy.get('tr.o_data_row').eq(num - 1)
   }
 
-  getColumn(row, number){
+  getColumn(row, number) {
     return row.children().eq(number)
   }
 
-  getCell(rowNum, colNum){
+  getCell(rowNum, colNum) {
     return this.getRow(rowNum).children().eq(colNum)
   }
 }

@@ -4,15 +4,19 @@ import random from '../utils/random'
 
 export default class SaleOrderMock extends BaseMock {
   MODEL = 'sale.order'
-  productMock
+  private productMock: ProductMock
 
   constructor() {
     super(true)
-    this.productMock = new ProductMock()
   }
 
-  async generate(price=10000) {
-    await this.productMock.generate(random(), price)
+  async generate(productMock=null, price=10000) {
+    if(productMock){
+      this.productMock = productMock
+    } else{
+      this.productMock = new ProductMock()
+      await this.productMock.generate(random(), price)
+    }
     const productData = await this.productMock._get(['product_variant_id','display_name','uom_id'])
     const val = {
       "picking_policy": "direct",
@@ -28,8 +32,8 @@ export default class SaleOrderMock extends BaseMock {
     return this._generate(val)
   }
 
-  cleanup() {
-    super.cleanup()
-    this.productMock.cleanup()
+  async cleanup() {
+    await super.cleanup()
+    await this.productMock.cleanup()
   }
 }

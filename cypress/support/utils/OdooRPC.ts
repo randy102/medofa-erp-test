@@ -1,4 +1,4 @@
-import Odoo from 'odoo-xmlrpc'
+import Odoo = require("odoo-xmlrpc");
 
 export default class OdooRPC {
   static instance
@@ -15,51 +15,50 @@ export default class OdooRPC {
     });
   }
 
-  static getInstance() {
+  static getInstance(): OdooRPC {
     if (!this.instance) {
       this.instance = new OdooRPC()
     }
     return this.instance
   }
 
-  create(model, val) {
+  create(model, val): Promise<any> {
     return this.call(model, 'create', val)
   }
 
-  read(model, id, fields=false){
+  read(model, id, fields = false): Promise<any> {
     return this.call(model, 'read', [+id], fields)
   }
 
-  write(model, id, val) {
+  write(model, id, val): Promise<void> {
     return this.call(model, 'write', [id], val)
   }
 
-  archive(model, id) {
-    return this.write(model, id, {'active': false})
+  archive(model, id): Promise<void> {
+    return this.write(model, id, { 'active': false })
   }
 
-  unlink(model, id) {
+  unlink(model, id): Promise<void> {
     return this.call(model, 'unlink', id)
   }
 
-  call(model, method, ...params) {
+  call(model, method, ...params): Promise<any> {
     const odooInstance = this.odoo
     return new Promise((resolve, reject) => {
       odooInstance.connect(function (err) {
         if (err) {
-          console.log(model, method, params, {err})
+          console.log(model, method, params, { err })
           reject(err)
         }
         odooInstance.execute_kw(model, method, [params], function (err, value) {
           if (err) {
-            console.log(model, method, params, {err})
+            console.log(model, method, params, { err })
             reject(err)
           }
           resolve(value)
-          console.log(model, method, params, {value})
+          console.log(model, method, params, { value })
         });
       });
     })
   }
-
 }
