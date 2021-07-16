@@ -1,11 +1,11 @@
 import BasePage from './base_page'
 
 export default class CouponProgramPage extends BasePage {
-  navigate() {
-    super.navigate()
-    this.clickRootMenu('sale.sale_menu_root')
-    this.clickMenu('sale.product_menu_catalog')
-    this.clickMenu('sale_coupon.menu_coupon_type_config')
+  _navigate() {
+    super._navigate()
+    this._clickRootMenu('sale.sale_menu_root')
+    this._clickMenu('sale.product_menu_catalog')
+    this._clickMenu('sale_coupon.menu_coupon_type_config')
     cy.get('ol[role="navigation"]').children().should('have.length', 1)
   }
 
@@ -14,9 +14,9 @@ export default class CouponProgramPage extends BasePage {
   }
 
   generateCoupon(number, prefix, length) {
-    this.input('length', length)
-    this.input('nbr_coupons', number)
-    this.input('prefix', prefix)
-    this.clickButton('Generate')
+    this._input('length', length)
+    this._input('nbr_coupons', number)
+    this._input('prefix', prefix)
+    this._clickButton('Generate')
   }
 }

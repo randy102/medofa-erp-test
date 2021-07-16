@@ -5,6 +5,7 @@ import { MockItem } from './mock_item';
 class GenerateConfig{
   productMock?: ProductMock
   price?: number
+  qty?: number
 }
 
 export default class SaleOrderMock extends BaseMock implements MockItem{
@@ -15,7 +16,7 @@ export default class SaleOrderMock extends BaseMock implements MockItem{
     super(true)
   }
 
-  async generate({ productMock = null, price = 10000 }: GenerateConfig) {
+  async generate({ productMock = null, price = 10000, qty = 1 }: GenerateConfig) {
     if(productMock){
       this.productMock = productMock
     } else{
@@ -27,7 +28,7 @@ export default class SaleOrderMock extends BaseMock implements MockItem{
       "picking_policy": "direct",
       "partner_id": Cypress.env('erpPartnerId'),
       "order_line": [[0, 0, {
-        "product_uom_qty": 1,
+        "product_uom_qty": qty,
         "product_id": productData['product_variant_id'][0],
         "name": productData['display_name'],
         "product_uom": productData['uom_id'][0],

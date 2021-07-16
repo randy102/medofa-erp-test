@@ -1,47 +1,84 @@
 import login from '../utils/login'
 
 export default class BasePage {
-  navigate() {
+  _navigate() {
     login()
     cy.visit('/')
   }
 
-  clickRootMenu(id) {
+  _clickRootMenu(id) {
     cy.get('a.full[data-display="static"]').click()
-    this.clickMenu(id)
+    this._clickMenu(id)
     cy.wait(2000)
   }
 
-  clickMenu(id) {
+  _clickMenu(id) {
     cy.get(`a[data-menu-xmlid="${id}"]`).click()
   }
 
-  clickTreeItem(name) {
-    cy.get('.o_data_row').contains(name).as(name).should('exist')
+  _clickTreeItem(name, field?: string) {
+    let css = '.o_data_row'
+    if (field) {
+      css = `div[name="${field}"] ` + css
+    }
+    console.log({name, field, css})
+    cy.get(css).contains(name).as(name).should('exist')
     cy.get(`@${name}`).scrollIntoView().click()
   }
 
-  clickButton(name) {
-    cy.contains(new RegExp("^" + name + "$", "g")).scrollIntoView().click()
+  _inputTree(name: string, line: number, content: string) {
+    cy.get(`input[name="${name}"]`).eq(line).scrollIntoView().clear().type(content)
   }
 
-  input(name, content) {
+  _clickButton(text: string, name?: string) {
+    if (name)
+      cy.get(`button[name="${name}"]`).contains(new RegExp("^" + text + "$", "g")).scrollIntoView().click()
+    else
+      cy.contains(new RegExp("^" + text + "$", "g")).scrollIntoView().click()
+  }
+
+  _input(name, content) {
     cy.get(`input[name="${name}"]`).scrollIntoView().clear().type(content)
   }
 
-  getFirstRow() {
+  _getFirstRow() {
     return cy.get('tr.o_data_row')
   }
 
-  getRow(num) {
+  _getRow(num) {
     return cy.get('tr.o_data_row').eq(num - 1)
   }
 
-  getColumn(row, number) {
+  _getColumn(row, number) {
     return row.children().eq(number)
   }
 
-  getCell(rowNum, colNum) {
-    return this.getRow(rowNum).children().eq(colNum)
+  _getCell(rowNum, colNum) {
+    return this._getRow(rowNum).children().eq(colNum)
   }
+
+  _selectMany2one(name: string, value: string) {
+    cy.get(`div[name="${name}"]`).as(`many2one_${name}`).click().type(value)
+    cy.wait(2000)
+    cy.get(`@many2one_${name}`).type('{enter}')
+  }
+
+  _selectTreeMany2one(name: string, line: number, value: string) {
+    cy.get(`div[name="${name}"]`).eq(line).as(`many2one_${name}`).click().type(value)
+    cy.wait(2000)
+    cy.get(`@many2one_${name}`).type('{enter}')
+  }
+
+  _clickLinkText(name) {
+    cy.get('a').contains(name).click()
+  }
+
+  _clickCreateButton() {
+    cy.get('button.o_list_button_add').click()
+  }
+
+  _clickSaveButton() {
+    cy.get('button.o_form_button_save').click()
+  }
+
 }
