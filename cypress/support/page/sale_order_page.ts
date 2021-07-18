@@ -17,4 +17,6 @@ export default class SaleOrderPage extends BasePage{
   getStateButton(state: SaleState){
     return cy.get(`button[data-value="${state}"]`)
   }
+
+
 }

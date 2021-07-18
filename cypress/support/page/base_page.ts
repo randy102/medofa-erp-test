@@ -7,6 +7,11 @@ export default class BasePage {
     cy.visit('/')
   }
 
+  _navigateMainView(){
+    cy.get('.breadcrumb-item').eq(0).click()
+    cy.get('.breadcrumb-item').should('have.length',1)
+  }
+
   _clickRootMenu(id) {
     cy.get('a.full[data-display="static"]').click()
     this._clickMenu(id)
@@ -16,7 +21,6 @@ export default class BasePage {
   _clickMenu(id) {
     cy.get(`a[data-menu-xmlid="${id}"]`).click()
   }
-
 
   _clickButton(text: string, name?: string) {
     if (name)

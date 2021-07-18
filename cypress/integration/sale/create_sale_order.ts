@@ -8,6 +8,9 @@ const page = new SaleOrderPage()
 describe('Create Sale Order', function () {
   before(() =>{
     // productMock.with_cy(() => productMock.generate({}))
+  })
+
+  beforeEach(() =>{
     page._navigate()
   })
 
@@ -20,14 +23,22 @@ describe('Create Sale Order', function () {
     page._clickSaveButton()
     cy.get('button.o_form_button_edit').should('be.visible')
     page.getStateButton(SaleState.DRAFT).should('have.attr', 'aria-checked', 'true')
-    cy.get('div.oe_title span[name="name"]').invoke('text').as('order_name')
+
+    cy.get('div.oe_title span[name="name"]').invoke('text').as('order_name').then(order_name => {
+      page._navigateMainView()
+      page._findTreeColumn(order_name, 'flag_db').should('contain','10')
+    })
+
+
   });
 
   it('should receive order successfully', function () {
-    page._navigate()
     page._clickTreeItem(this.order_name)
     page._clickButton('Receive')
     page.getStateButton(SaleState.RECEIVED).should('have.attr', 'aria-checked', 'true')
+
+    page._navigateMainView()
+    page._findTreeColumn(this.order_name, 'flag_db').should('contain','15')
   });
 
   after(() => {
