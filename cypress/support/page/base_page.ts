@@ -16,19 +16,6 @@ export default class BasePage {
     cy.get(`a[data-menu-xmlid="${id}"]`).click()
   }
 
-  _clickTreeItem(name, field?: string) {
-    let css = '.o_data_row'
-    if (field) {
-      css = `div[name="${field}"] ` + css
-    }
-    console.log({name, field, css})
-    cy.get(css).contains(name).as(name).should('exist')
-    cy.get(`@${name}`).scrollIntoView().click()
-  }
-
-  _inputTree(name: string, line: number, content: string) {
-    cy.get(`input[name="${name}"]`).eq(line).scrollIntoView().clear().type(content)
-  }
 
   _clickButton(text: string, name?: string) {
     if (name)
@@ -37,24 +24,20 @@ export default class BasePage {
       cy.contains(new RegExp("^" + text + "$", "g")).scrollIntoView().click()
   }
 
+  _clickLinkText(name) {
+    cy.get('a').contains(name).click()
+  }
+
+  _clickCreateButton() {
+    cy.get('button.o_list_button_add').click()
+  }
+
+  _clickSaveButton() {
+    cy.get('button.o_form_button_save').click()
+  }
+
   _input(name, content) {
     cy.get(`input[name="${name}"]`).scrollIntoView().clear().type(content)
-  }
-
-  _getFirstRow() {
-    return cy.get('tr.o_data_row')
-  }
-
-  _getRow(num) {
-    return cy.get('tr.o_data_row').eq(num - 1)
-  }
-
-  _getColumn(row, number) {
-    return row.children().eq(number)
-  }
-
-  _getCell(rowNum, colNum) {
-    return this._getRow(rowNum).children().eq(colNum)
   }
 
   _selectMany2one(name: string, value: string) {
@@ -69,16 +52,26 @@ export default class BasePage {
     cy.get(`@many2one_${name}`).type('{enter}')
   }
 
-  _clickLinkText(name) {
-    cy.get('a').contains(name).click()
+  _findTreeRow(key: string){
+    return cy.get('tr.o_data_row').contains(key)
   }
 
-  _clickCreateButton() {
-    cy.get('button.o_list_button_add').click()
+  _clickTreeItem(name, field?: string) {
+    let css = '.o_data_row'
+    if (field) {
+      css = `div[name="${field}"] ` + css
+    }
+    console.log({name, field, css})
+    cy.get(css).contains(name).as(name).should('exist')
+    cy.get(`@${name}`).scrollIntoView().click()
   }
 
-  _clickSaveButton() {
-    cy.get('button.o_form_button_save').click()
+  _inputTree(name: string, line: number, content: string) {
+    cy.get(`input[name="${name}"]`).eq(line).scrollIntoView().clear().type(content)
+  }
+
+  _getTreeCell(rowNum, colNum) {
+    return cy.get('tr.o_data_row').eq(rowNum - 1).children().eq(colNum)
   }
 
 }

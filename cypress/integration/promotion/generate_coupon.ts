@@ -26,7 +26,7 @@ describe('Generate coupon with length and prefix', function () {
 
     page.getNumberOfCoupon().should('contain', '1')
     page._clickButton('Coupons')
-    page._getCell(1, 1).invoke('text').as('coupon_code').should('have.length', 9).and('include', 'ABC')
+    page._getTreeCell(1, 1).invoke('text').as('coupon_code').should('have.length', 9).and('include', 'ABC')
     cy.go('back')
   });
 

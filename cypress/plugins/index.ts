@@ -12,11 +12,14 @@
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
+import { config } from 'dotenv';
+import ProductMock from '../support/mock/product_mock';
+
 /**
  * @type {Cypress.PluginConfig}
  */
 // eslint-disable-next-line no-unused-vars
-require('dotenv').config()
+config()
 
 module.exports = (on, config) => {
   config.baseUrl = process.env.BASE_URL

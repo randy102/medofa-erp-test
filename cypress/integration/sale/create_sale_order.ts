@@ -1,7 +1,8 @@
 import ProductMock from '../../support/mock/product_mock';
 import SaleOrderPage, { SaleState } from '../../support/page/sale_order_page';
+import { MockItem } from '../../support/mock/mock_item';
 
-const productMock = new ProductMock()
+const productMock: MockItem = new ProductMock()
 const page = new SaleOrderPage()
 
 describe('Create Sale Order', function () {
@@ -14,7 +15,7 @@ describe('Create Sale Order', function () {
     page._clickCreateButton()
     page._selectMany2one('partner_id', 'Quang Trần')
     page._clickLinkText('Add a product')
-    page._selectTreeMany2one('product_template_id', 0 ,'test')
+    page._selectTreeMany2one('product_id', 0 ,'test')
     page._inputTree('product_uom_qty',0, '5')
     page._clickSaveButton()
     cy.get('button.o_form_button_edit').should('be.visible')
@@ -28,4 +29,8 @@ describe('Create Sale Order', function () {
     page._clickButton('Receive')
     page.getStateButton(SaleState.RECEIVED).should('have.attr', 'aria-checked', 'true')
   });
+
+  after(() => {
+    productMock.cleanup()
+  })
 });

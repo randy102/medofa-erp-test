@@ -15,7 +15,6 @@ export default class ProductMock extends BaseMock implements MockItem {
   }
 
   generate({ name = random(), price = 10000 }: GenerateConfig) {
-    console.log({ name, price })
     const val = {
       name,
       list_price: price
