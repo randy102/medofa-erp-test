@@ -41,14 +41,35 @@ export default class BasePage {
     cy.get('button.o_form_button_save').click()
   }
 
+  _clickTab(title: string){
+    cy.contains('a[data-toggle="tab"]',title).click()
+  }
+
+  _clickActionButton(title: string){
+    cy.contains('button.o_dropdown_toggler_btn','Action').as('action_button').click()
+    cy.get('@action_button').next().contains('a[role="menuitem"]',title).click()
+  }
+
+  _findToast(content: string): Chainable{
+    return cy.contains('.toast-body',content)
+  }
+
   _input(name, content) {
     cy.get(`input[name="${name}"]`).scrollIntoView().clear().type(content)
+  }
+
+  _textArea(name, content){
+    cy.get(`textarea[name="${name}"]`).scrollIntoView().clear().type(content)
   }
 
   _selectMany2one(name: string, value: string) {
     cy.get(`div[name="${name}"]`).as(`many2one_${name}`).click().type(value)
     cy.wait(2000)
     cy.get(`@many2one_${name}`).type('{enter}')
+  }
+
+  _findFormField(name): Chainable{
+    return cy.get(`.o_field_widget[name="${name}"]`)
   }
 
   _selectTreeMany2one(name: string, line: number, value: string) {
@@ -73,10 +94,14 @@ export default class BasePage {
     return cy.get(css).eq(rowNum - 1).children().eq(colNum)
   }
 
-  _clickTreeItem(name, field?: string) {
+  _clickTreeItem(name: string, field?: string) {
     const css = BasePage.getFieldTreeCss('tr.o_data_row', field)
     cy.contains(css, name).as(name).should('exist')
     cy.get(`@${name}`).scrollIntoView().click()
+  }
+
+  _checkTreeItem(name: string){
+    this._findTreeRow(name).find('div.custom-control.custom-checkbox').click()
   }
 
   _inputTree(name: string, line: number, content: string, field?: string) {

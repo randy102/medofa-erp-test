@@ -3,7 +3,8 @@ import BasePage from './base_page'
 export enum SaleState {
   DRAFT = 'draft',
   RECEIVED = 'receive',
-  CONFIRMED = 'sale'
+  CONFIRMED = 'sale',
+  CANCELED = 'cancel'
 }
 
 export default class SaleOrderPage extends BasePage{
