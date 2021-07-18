@@ -1,4 +1,5 @@
 import login from '../utils/login'
+import Chainable = Cypress.Chainable;
 
 export default class BasePage {
   _navigate() {
@@ -19,13 +20,13 @@ export default class BasePage {
 
   _clickButton(text: string, name?: string) {
     if (name)
-      cy.get(`button[name="${name}"]`).contains(new RegExp("^" + text + "$", "g")).scrollIntoView().click()
+      cy.contains(`button[name="${name}"]`,new RegExp("^" + text + "$", "g")).scrollIntoView().click()
     else
-      cy.contains(new RegExp("^" + text + "$", "g")).scrollIntoView().click()
+      cy.contains('button',new RegExp("^" + text + "$", "g")).scrollIntoView().click()
   }
 
   _clickLinkText(name) {
-    cy.get('a').contains(name).click()
+    cy.contains('a',name).click()
   }
 
   _clickCreateButton() {
@@ -52,26 +53,39 @@ export default class BasePage {
     cy.get(`@many2one_${name}`).type('{enter}')
   }
 
-  _findTreeRow(key: string){
-    return cy.get('tr.o_data_row').contains(key)
+  _findTreeRow(key: string, field?: string): Chainable {
+    const css = BasePage.getFieldTreeCss('tr.o_data_row', field)
+    return cy.contains(css, key)
+  }
+
+  _findTreeColumn(rowKey: string, colName: string, field?: string):  Chainable{
+    return this._getTreeColumnIndex(colName, field).then((index) => {
+      return this._findTreeRow(rowKey, field).children().eq(index)
+    })
+  }
+
+  _getTreeCell(rowNum: number, colNum: number, field?: string): Chainable {
+    const css = BasePage.getFieldTreeCss('tr.o_data_row', field)
+    return cy.get(css).eq(rowNum - 1).children().eq(colNum)
   }
 
   _clickTreeItem(name, field?: string) {
-    let css = '.o_data_row'
-    if (field) {
-      css = `div[name="${field}"] ` + css
-    }
-    console.log({name, field, css})
-    cy.get(css).contains(name).as(name).should('exist')
+    const css = BasePage.getFieldTreeCss('tr.o_data_row', field)
+    cy.contains(css, name).as(name).should('exist')
     cy.get(`@${name}`).scrollIntoView().click()
   }
 
-  _inputTree(name: string, line: number, content: string) {
-    cy.get(`input[name="${name}"]`).eq(line).scrollIntoView().clear().type(content)
+  _inputTree(name: string, line: number, content: string, field?: string) {
+    const css = BasePage.getFieldTreeCss(`tr.o_data_row input[name="${name}"]`, field)
+    cy.get(css).eq(line).scrollIntoView().clear().type(content)
   }
 
-  _getTreeCell(rowNum, colNum) {
-    return cy.get('tr.o_data_row').eq(rowNum - 1).children().eq(colNum)
+  _getTreeColumnIndex(name: string, field?: string): Chainable{
+    const css = BasePage.getFieldTreeCss(`table.o_list_table th[data-name="${name}"]`,field)
+    return cy.get(css).invoke('index')
   }
 
+  private static getFieldTreeCss(css, field){
+    return  field ? `div[name="${field}"] ` + css : css
+  }
 }
