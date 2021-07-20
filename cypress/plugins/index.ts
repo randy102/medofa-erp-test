@@ -13,7 +13,6 @@
 // the project's config changing)
 
 import { config } from 'dotenv';
-import ProductMock from '../support/mock/product_mock';
 
 /**
  * @type {Cypress.PluginConfig}

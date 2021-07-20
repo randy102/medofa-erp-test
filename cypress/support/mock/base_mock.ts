@@ -1,22 +1,30 @@
 import OdooRPC from '../utils/OdooRPC'
+import { MockItem } from './mock_item';
 
-export default class BaseMock {
+export default abstract class BaseMock<Config> implements MockItem<Config> {
   id: number
   rpc: OdooRPC
   MODEL: string
-  canDelete: boolean
+  CAN_DELETE: boolean = false
+  config = {}
 
-  constructor(canDelete = false) {
+  constructor(config?: Config) {
     this.rpc = OdooRPC.getInstance()
-    this.canDelete = canDelete
+    this.setConfig(config)
   }
 
-  _generate(val): Promise<number> {
-    return this.rpc.create(this.MODEL, val).then(result => {
-      console.log('Mock Generated')
-      this.id = result
-      return result
-    })
+  abstract getConfig(config: Config | {}): Promise<object>
+
+  setConfig(config: Config | {} = {}){
+    this.config = config
+  }
+
+  async generate(): Promise<number> {
+    const config = await this.getConfig(this.config)
+    const created = await this.rpc.create(this.MODEL, config)
+    console.log('Mock Generated')
+    this.id = created
+    return created
   }
 
   async get(fields: string[]): Promise<object> {
@@ -33,7 +41,7 @@ export default class BaseMock {
   }
 
   async cleanup() {
-    if (this.canDelete)
+    if (this.CAN_DELETE)
       await this.rpc.unlink(this.MODEL, this.id)
     else
       await this.rpc.archive(this.MODEL, this.id)

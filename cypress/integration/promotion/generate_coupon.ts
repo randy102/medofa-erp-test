@@ -4,15 +4,15 @@ import CouponProgramPage from '../../support/page/coupon_program_page'
 import SaleOrderMock from '../../support/mock/sale_order_mock'
 import SaleOrderPage from '../../support/page/sale_order_page'
 
-const couponProgramMock = new CouponProgramMock()
-const saleOrderMock = new SaleOrderMock()
 const programName = random()
+const couponProgramMock = new CouponProgramMock({ name: programName })
+const saleOrderMock = new SaleOrderMock()
 const page = new CouponProgramPage()
 const salePage = new SaleOrderPage()
 
 describe('Generate coupon with length and prefix', function () {
   before(() => {
-    couponProgramMock.with_cy(() => couponProgramMock.generate({ name: programName }))
+    couponProgramMock.with_cy(() => couponProgramMock.generate())
     page._navigate()
   })
 
@@ -56,7 +56,7 @@ describe('Generate coupon with length and prefix', function () {
   });
 
   it('should apply code to sale order successfully', function () {
-    saleOrderMock.with_cy(() => saleOrderMock.generate({}))
+    saleOrderMock.with_cy(() => saleOrderMock.generate())
     salePage._navigate()
     saleOrderMock.with_cy(() => saleOrderMock.get(['name'])).then(data => {
       salePage._clickTreeItem(data['name'])

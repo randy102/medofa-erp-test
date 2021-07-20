@@ -2,19 +2,15 @@ import BaseMock from './base_mock'
 import { MockItem } from './mock_item';
 import random from '../utils/random';
 
-class GenerateConfig{
+export class CouponProgramConfig{
   name?: string
 }
 
-export default class CouponProgramMock extends BaseMock implements MockItem{
+export default class CouponProgramMock extends BaseMock<CouponProgramConfig>{
   MODEL = 'sale.coupon.program'
 
-  constructor() {
-    super()
-  }
-
-  generate({ name = random() }: GenerateConfig) {
-    const val = {
+  async getConfig({ name = random() }: CouponProgramConfig): Promise<object> {
+    return {
       "active": true,
       "program_type": "coupon_program",
       "rule_products_domain": "[['sale_ok', '=', True]]",
@@ -31,6 +27,5 @@ export default class CouponProgramMock extends BaseMock implements MockItem{
       "name": name,
       "discount_fixed_amount": 0,
     }
-    return super._generate(val)
   }
 }

@@ -11,7 +11,7 @@ describe('Create Sale Order', function () {
   })
 
   it('should create order', function () {
-    productMock.with_cy(() => productMock.generate({}))
+    productMock.with_cy(() => productMock.generate())
     page._clickCreateButton()
     page._selectMany2one('partner_id', 'Quang Trần')
     page._clickLinkText('Add a product')
