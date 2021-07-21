@@ -2,11 +2,7 @@ import Chainable = Cypress.Chainable;
 import OdooRPC from '../utils/OdooRPC';
 
 export interface MockItem<Config = {}> {
-  MODEL: string
-  CAN_DELETE: boolean
-  config: Config | {}
-  id: number
-  rpc: OdooRPC
+  getId(): number
 
   generate(): Promise<number>
 
@@ -15,6 +11,4 @@ export interface MockItem<Config = {}> {
   get(fields: string[]): Promise<object>
 
   with_cy(asyncCallback: () => Promise<any>): Chainable
-
-  getConfig(config: Config | {}): Promise<object>
 }

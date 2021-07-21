@@ -5,6 +5,7 @@ import SaleOrderMock from '../../support/mock/sale_order_mock'
 import SaleOrderPage from '../../support/page/sale_order_page'
 
 const programName = random()
+// const couponProgramMock = new CouponProgramMock({ name: programName })
 const couponProgramMock = new CouponProgramMock({ name: programName })
 const saleOrderMock = new SaleOrderMock()
 const page = new CouponProgramPage()

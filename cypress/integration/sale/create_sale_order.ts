@@ -7,7 +7,7 @@ const page = new SaleOrderPage()
 
 describe('Create Sale Order', function () {
   beforeEach(() => {
-    page._navigate()
+    page.navigate()
   })
 
   it('should create order', function () {

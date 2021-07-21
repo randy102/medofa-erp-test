@@ -1,5 +1,4 @@
 import BaseMock from './base_mock'
-import { MockItem } from './mock_item';
 import random from '../utils/random';
 
 export class CouponProgramConfig{
@@ -9,7 +8,7 @@ export class CouponProgramConfig{
 export default class CouponProgramMock extends BaseMock<CouponProgramConfig>{
   MODEL = 'sale.coupon.program'
 
-  async getConfig({ name = random() }: CouponProgramConfig): Promise<object> {
+  protected async getCreateParam({ name = random() }: CouponProgramConfig): Promise<object> {
     return {
       "active": true,
       "program_type": "coupon_program",

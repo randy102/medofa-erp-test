@@ -1,7 +1,7 @@
 import BasePage from './base_page'
 
 export default class CouponProgramPage extends BasePage {
-  _navigate() {
+  navigate() {
     super._navigate()
     this._clickRootMenu('sale.sale_menu_root')
     this._clickMenu('sale.product_menu_catalog')

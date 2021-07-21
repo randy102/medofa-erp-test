@@ -9,7 +9,7 @@ export default class MockFactory<Config> {
     }
   }
 
-  generate(configs: any[]): Promise<number[]>{
+  generate(): Promise<number[]>{
     return Promise.all(this.mockList?.map(mock => mock.generate()))
   }
 
@@ -28,7 +28,7 @@ export default class MockFactory<Config> {
   }
 
   getMockById(id: number):MockItem{
-    return this.mockList.find(mock => mock.id == id)
+    return this.mockList.find(mock => mock.getId() == id)
   }
 
   getById(id: number, fields: string[]): Promise<object> {

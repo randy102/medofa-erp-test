@@ -8,7 +8,7 @@ export enum SaleState {
 }
 
 export default class SaleOrderPage extends BasePage{
-  _navigate() {
+  navigate() {
     super._navigate()
     this._clickRootMenu('sale.sale_menu_root')
     this._clickMenu('sale.sale_order_menu')

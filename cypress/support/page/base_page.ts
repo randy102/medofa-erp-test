@@ -1,15 +1,17 @@
 import login from '../utils/login'
 import Chainable = Cypress.Chainable;
 
-export default class BasePage {
+export default abstract class BasePage {
+  abstract navigate()
+
   _navigate() {
     login()
     cy.visit('/')
   }
 
-  _navigateMainView(){
+  _navigateMainView() {
     cy.get('.breadcrumb-item').eq(0).click()
-    cy.get('.breadcrumb-item').should('have.length',1)
+    cy.get('.breadcrumb-item').should('have.length', 1)
   }
 
   _clickRootMenu(id) {
@@ -24,13 +26,13 @@ export default class BasePage {
 
   _clickButton(text: string, name?: string) {
     if (name)
-      cy.contains(`button[name="${name}"]`,new RegExp("^" + text + "$", "g")).scrollIntoView().click()
+      cy.contains(`button[name="${name}"]`, new RegExp("^" + text + "$", "g")).scrollIntoView().click()
     else
-      cy.contains('button',new RegExp("^" + text + "$", "g")).scrollIntoView().click()
+      cy.contains('button', new RegExp("^" + text + "$", "g")).scrollIntoView().click()
   }
 
   _clickLinkText(name) {
-    cy.contains('a',name).click()
+    cy.contains('a', name).click()
   }
 
   _clickCreateButton() {
@@ -41,24 +43,24 @@ export default class BasePage {
     cy.get('button.o_form_button_save').click()
   }
 
-  _clickTab(title: string){
-    cy.contains('a[data-toggle="tab"]',title).click()
+  _clickTab(title: string) {
+    cy.contains('a[data-toggle="tab"]', title).click()
   }
 
-  _clickActionButton(title: string){
-    cy.contains('button.o_dropdown_toggler_btn','Action').as('action_button').click()
-    cy.get('@action_button').next().contains('a[role="menuitem"]',title).click()
+  _clickActionButton(title: string) {
+    cy.contains('button.o_dropdown_toggler_btn', 'Action').as('action_button').click()
+    cy.get('@action_button').next().contains('a[role="menuitem"]', title).click()
   }
 
-  _findToast(content: string): Chainable{
-    return cy.contains('.toast-body',content)
+  _findToast(content: string): Chainable {
+    return cy.contains('.toast-body', content)
   }
 
   _input(name, content) {
     cy.get(`input[name="${name}"]`).scrollIntoView().clear().type(content)
   }
 
-  _textArea(name, content){
+  _textArea(name, content) {
     cy.get(`textarea[name="${name}"]`).scrollIntoView().clear().type(content)
   }
 
@@ -68,7 +70,7 @@ export default class BasePage {
     cy.get(`@many2one_${name}`).type('{enter}')
   }
 
-  _findFormField(name): Chainable{
+  _findFormField(name): Chainable {
     return cy.get(`.o_field_widget[name="${name}"]`)
   }
 
@@ -78,12 +80,20 @@ export default class BasePage {
     cy.get(`@many2one_${name}`).type('{enter}')
   }
 
+  _findTreeGroupRow(key: string): Chainable {
+    return cy.contains('tr.o_group_header', key)
+  }
+
   _findTreeRow(key: string, field?: string): Chainable {
     const css = BasePage.getFieldTreeCss('tr.o_data_row', field)
     return cy.contains(css, key)
   }
 
-  _findTreeColumn(rowKey: string, colName: string, field?: string):  Chainable{
+  _findTreeGroupColumn(rowKey: string, colName: string): Chainable {
+    return this._findTreeGroupRow(rowKey).find(`tr>td.o_list_number.${colName}`)
+  }
+
+  _findTreeColumn(rowKey: string, colName: string, field?: string): Chainable {
     return this._getTreeColumnIndex(colName, field).then((index) => {
       return this._findTreeRow(rowKey, field).children().eq(index)
     })
@@ -94,13 +104,18 @@ export default class BasePage {
     return cy.get(css).eq(rowNum - 1).children().eq(colNum)
   }
 
+  _getTreeColumnIndex(name: string, field?: string): Chainable {
+    const css = BasePage.getFieldTreeCss(`table.o_list_table th[data-name="${name}"]`, field)
+    return cy.get(css).invoke('index')
+  }
+
   _clickTreeItem(name: string, field?: string) {
     const css = BasePage.getFieldTreeCss('tr.o_data_row', field)
     cy.contains(css, name).as(name).should('exist')
     cy.get(`@${name}`).scrollIntoView().click()
   }
 
-  _checkTreeItem(name: string){
+  _checkTreeItem(name: string) {
     this._findTreeRow(name).find('div.custom-control.custom-checkbox').click()
   }
 
@@ -109,12 +124,13 @@ export default class BasePage {
     cy.get(css).eq(line).scrollIntoView().clear().type(content)
   }
 
-  _getTreeColumnIndex(name: string, field?: string): Chainable{
-    const css = BasePage.getFieldTreeCss(`table.o_list_table th[data-name="${name}"]`,field)
-    return cy.get(css).invoke('index')
+
+
+  _getSearchContainer(): Chainable {
+    return cy.get('div.o_searchview_input_container')
   }
 
-  private static getFieldTreeCss(css, field){
-    return  field ? `div[name="${field}"] ` + css : css
+  private static getFieldTreeCss(css, field) {
+    return field ? `div[name="${field}"] ` + css : css
   }
 }

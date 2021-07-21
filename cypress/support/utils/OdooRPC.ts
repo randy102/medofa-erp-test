@@ -5,7 +5,7 @@ export default class OdooRPC {
   odoo
 
   constructor() {
-    console.log('-----------Create OdooRPC instance-------------')
+    console.log('OdooRPC instance created.')
     this.odoo = new Odoo({
       url: Cypress.config('baseUrl'),
       port: Cypress.env('erpPort'),
@@ -39,7 +39,14 @@ export default class OdooRPC {
   }
 
   unlink(model, id): Promise<void> {
+    if (!Array.isArray(id)){
+      id = [id]
+    }
     return this.call(model, 'unlink', id)
+  }
+
+  search(model, domain = [], fields: string[] = [], limit: number = 1): Promise<any[]> {
+    return this.call(model, 'search_read', domain, fields, 0, limit)
   }
 
   call(model, method, ...params): Promise<any> {
@@ -47,16 +54,17 @@ export default class OdooRPC {
     return new Promise((resolve, reject) => {
       odooInstance.connect(function (err) {
         if (err) {
-          console.log(model, method, params, { err })
+          console.log(err)
           reject(err)
         }
         odooInstance.execute_kw(model, method, [params], function (err, value) {
           if (err) {
-            console.log(model, method, params, { err })
+            console.log(err)
             reject(err)
+          } else{
+            resolve(value)
+            console.log(`Executed Successfully: ${model}.${method}(${JSON.stringify(params)}) => ${value}`)
           }
-          resolve(value)
-          console.log(model, method, params, { value })
         });
       });
     })
