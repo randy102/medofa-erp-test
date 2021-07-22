@@ -12,12 +12,9 @@ const page = new CouponProgramPage()
 const salePage = new SaleOrderPage()
 
 describe('Generate coupon with length and prefix', function () {
-  beforeEach(() => {
+  it('should generate coupon code successfully', function () {
     BaseMock.with_cy(() => couponProgramMock.generate())
     page.navigate()
-  })
-
-  it('should generate coupon code successfully', function () {
     page._clickTreeItem(programName)
 
     page.getNumberOfCoupon().should('contain', '0')
@@ -36,6 +33,7 @@ describe('Generate coupon with length and prefix', function () {
     const exceededCouponError = 'Coupon Code Exceeded! Please change another prefix, length or number of coupons!'
     const maxCouponError = 'Can only generate maximum 10 coupons!'
 
+    page.navigate()
     page._clickTreeItem(programName)
     page._clickButton('Generate Coupon')
     page.generateCoupon('11', prefix, '1')
@@ -45,7 +43,7 @@ describe('Generate coupon with length and prefix', function () {
     page.generateCoupon('5', prefix, '1')
     page.getNumberOfCoupon().should('contain', '6')
 
-    for(let currentCoupon = 7; currentCoupon <= 11; currentCoupon++){
+    for (let currentCoupon = 7; currentCoupon <= 11; currentCoupon++) {
       page._clickButton('Generate Coupon')
       page.generateCoupon('6', prefix, '1')
       cy.contains(exceededCouponError).should('be.visible')
@@ -54,12 +52,12 @@ describe('Generate coupon with length and prefix', function () {
       page.generateCoupon('1', prefix, '1')
       page.getNumberOfCoupon().should('contain', currentCoupon.toString())
     }
-
   });
 
   it('should apply code to sale order successfully', function () {
     BaseMock.with_cy(() => saleOrderMock.generate())
     salePage.navigate()
+
     BaseMock.with_cy(() => saleOrderMock.get(['name'])).then(data => {
       salePage._clickTreeItem(data['name'])
       salePage._clickButton('Coupon')

@@ -17,7 +17,7 @@ export default abstract class MockFactory<Config> {
   }
 
   cleanup(): Promise<void[]> {
-    return Promise.all(this.mockList?.map(mock => mock.cleanup()))
+    return Promise.all(this.mockList?.map(mock => mock.cleanup(false)))
   }
 
   length(): number {

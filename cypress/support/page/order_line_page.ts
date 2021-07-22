@@ -6,6 +6,7 @@ export default class OrderLinePage extends BasePage{
     this._clickRootMenu('sale.sale_menu_root')
     this._clickMenu('sale.sale_order_menu')
     this._clickMenu('medofa_order_lines.medofa_order_lines_menu')
+    this._ensurePageTitle('Order Lines')
   }
 
 }

@@ -1,20 +1,26 @@
-import BaseMock from './base_mock'
+import BaseMock, { BaseConfig } from './base_mock'
 import random from '../utils/random';
 
-export class ProductConfig {
+export class ProductConfig extends BaseConfig<ProductDepend>{
   name?: string
   price?: number
 }
 
-export default class ProductMock extends BaseMock<ProductConfig> {
+export type ProductDepend = {}
+
+export default class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
   MODEL = 'product.template'
   CAN_DELETE = true
 
-  protected async getCreateParam({ name = random(), price = 10000 }: ProductConfig): Promise<object> {
+  protected async getDependency(config: Partial<ProductConfig>): Promise<ProductDepend> {
+    return {};
+  }
+
+  protected async getCreateParam({ price, name }: ProductConfig): Promise<object> {
     return {
-      name,
-      list_price: price
-    };
+      name: name || random(),
+      list_price: price || 100000
+    }
   }
 
 }

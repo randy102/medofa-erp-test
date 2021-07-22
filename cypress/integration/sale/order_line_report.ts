@@ -7,11 +7,15 @@ import BaseMock from '../../support/mock/base_mock';
 const page = new OrderLinePage()
 const productMock = new ProductMock()
 const mock = new SaleOrderFactory([
-  {productMock, state:'Received'},
-  {productMock, state:'Confirmed'},
-  {productMock, state:'Cancelled'},
+  {depends: {product: productMock}, state:'Received'},
+  {depends: {product: productMock}, state:'Confirmed'},
+  {depends: {product: productMock}, state:'Cancelled'},
 ])
 describe('Order Line Report', function () {
+  before(() => {
+    BaseMock.with_cy(() => mock.generate())
+  })
+
   beforeEach(() => {
     page.navigate()
   })
@@ -21,11 +25,16 @@ describe('Order Line Report', function () {
     cy.get('.o_list_table_grouped').should('be.visible')
   });
 
-  it.only('should test', function () {
-    BaseMock.with_cy(() => mock.generate())
+  it.only('should display product quantities correctly', function () {
+    BaseMock.with_cy(() => productMock.get(['default_code'])).then(({ default_code }) =>{
+      page._inputSearch(default_code, 'Product')
+      page._findTreeGroupRow(default_code).should('be.visible')
+    })
   });
 
   after(() => {
-    // mock.cleanup()
+    mock.cleanup().then(() => {
+      productMock.cleanup()
+    })
   })
 });

@@ -6,7 +6,7 @@ export interface MockItem<Config = {}> {
 
   generate(): Promise<number>
 
-  cleanup(): Promise<void>
+  cleanup(cleanupDependencies?: boolean): Promise<void>
 
   get(fields: string[]): Promise<object>
 }

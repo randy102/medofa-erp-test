@@ -4,9 +4,16 @@ import Chainable = Cypress.Chainable;
 export default abstract class BasePage {
   abstract navigate()
 
+  /**
+   * @description General
+   */
   _navigate() {
     login()
     cy.visit('/')
+  }
+
+  _ensurePageTitle(title){
+    cy.contains('.breadcrumb-item.active',title).should('be.visible')
   }
 
   _navigateMainView() {
@@ -35,16 +42,8 @@ export default abstract class BasePage {
     cy.contains('a', name).click()
   }
 
-  _clickCreateButton() {
-    cy.get('button.o_list_button_add').click()
-  }
-
-  _clickSaveButton() {
-    cy.get('button.o_form_button_save').click()
-  }
-
-  _clickTab(title: string) {
-    cy.contains('a[data-toggle="tab"]', title).click()
+  _findToast(content: string): Chainable {
+    return cy.contains('.toast-body', content)
   }
 
   _clickActionButton(title: string) {
@@ -52,8 +51,20 @@ export default abstract class BasePage {
     cy.get('@action_button').next().contains('a[role="menuitem"]', title).click()
   }
 
-  _findToast(content: string): Chainable {
-    return cy.contains('.toast-body', content)
+  _clickCreateButton() {
+    cy.get('button.o_list_button_add').click()
+  }
+
+
+  /**
+   * @description Form View
+   */
+  _clickSaveButton() {
+    cy.get('button.o_form_button_save').click()
+  }
+
+  _clickTab(title: string) {
+    cy.contains('a[data-toggle="tab"]', title).click()
   }
 
   _input(name, content) {
@@ -74,6 +85,9 @@ export default abstract class BasePage {
     return cy.get(`.o_field_widget[name="${name}"]`)
   }
 
+  /**
+   * @description Tree View
+   */
   _selectTreeMany2one(name: string, line: number, value: string) {
     cy.get(`div[name="${name}"]`).eq(line).as(`many2one_${name}`).click().type(value)
     cy.wait(2000)
@@ -127,6 +141,11 @@ export default abstract class BasePage {
 
   _getSearchContainer(): Chainable {
     return cy.get('div.o_searchview_input_container')
+  }
+
+  _inputSearch(keyword, type){
+    cy.get('.o_searchview_input_container input[type="text"]').type(keyword)
+    cy.contains('.o_searchview_input_container .o_searchview_autocomplete a',type).click()
   }
 
   private static getFieldTreeCss(css, field) {

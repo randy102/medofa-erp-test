@@ -1,27 +1,30 @@
-import BaseMock from './base_mock'
+import BaseMock, { BaseConfig } from './base_mock'
 import ProductMock from './product_mock'
 
-export class SaleOrderConfig {
-  productMock?: ProductMock
+export class SaleOrderConfig extends BaseConfig<SaleOrderDepends> {
   price?: number
   qty?: number
   state?: 'Received' | 'Confirmed' | 'Cancelled' | 'Progressing'
 }
 
-export default class SaleOrderMock extends BaseMock<SaleOrderConfig> {
+export type SaleOrderDepends = {
+  product?: ProductMock
+}
+
+export default class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
   MODEL = 'sale.order'
   CAN_DELETE = true
 
-  private productMock: ProductMock
-
-  protected async getCreateParam({ productMock = null, price = 10000, qty = 1 }: SaleOrderConfig): Promise<object> {
-    if (productMock) {
-      this.productMock = productMock
-    } else {
-      this.productMock = new ProductMock({ price })
+  protected async getDependency({ depends , price = 100000}: Partial<SaleOrderConfig>): Promise<SaleOrderDepends> {
+    const { product } = depends
+    if (!product) {
+      depends.product = new ProductMock({ price })
     }
-    await this.productMock.generate()
-    const productData = await this.productMock.get(['product_variant_id', 'display_name', 'uom_id'])
+    return depends
+  }
+
+  protected async getCreateParam({ qty = 1 }: SaleOrderConfig, { product }: SaleOrderDepends): Promise<object> {
+    const productData = await product.get(['product_variant_id', 'display_name', 'uom_id'])
     return {
       "picking_policy": "direct",
       "partner_id": Cypress.env('erpPartnerId'),
@@ -68,9 +71,5 @@ export default class SaleOrderMock extends BaseMock<SaleOrderConfig> {
       const { picking_ids } = await this.get(['picking_ids'])
       await this.rpc.unlink('stock.picking', picking_ids)
     }
-  }
-
-  protected async afterCleanup(config: Partial<SaleOrderConfig>): Promise<void> {
-    await this.productMock.cleanup()
   }
 }
