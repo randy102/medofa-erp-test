@@ -9,6 +9,4 @@ export interface MockItem<Config = {}> {
   cleanup(): Promise<void>
 
   get(fields: string[]): Promise<object>
-
-  with_cy(asyncCallback: () => Promise<any>): Chainable
 }

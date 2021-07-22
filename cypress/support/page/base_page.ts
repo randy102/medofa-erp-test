@@ -28,7 +28,7 @@ export default abstract class BasePage {
     if (name)
       cy.contains(`button[name="${name}"]`, new RegExp("^" + text + "$", "g")).scrollIntoView().click()
     else
-      cy.contains('button', new RegExp("^" + text + "$", "g")).scrollIntoView().click()
+      cy.contains('button', text).scrollIntoView().click()
   }
 
   _clickLinkText(name) {
@@ -123,7 +123,6 @@ export default abstract class BasePage {
     const css = BasePage.getFieldTreeCss(`tr.o_data_row input[name="${name}"]`, field)
     cy.get(css).eq(line).scrollIntoView().clear().type(content)
   }
-
 
 
   _getSearchContainer(): Chainable {

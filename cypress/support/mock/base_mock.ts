@@ -5,6 +5,7 @@ export default abstract class BaseMock<Config> implements MockItem<Config> {
   protected rpc: OdooRPC
   protected MODEL: string
   protected CAN_DELETE: boolean = false
+  private generated:boolean = false
 
   private id: number
   private config: Partial<Config>
@@ -27,7 +28,9 @@ export default abstract class BaseMock<Config> implements MockItem<Config> {
     const config = await this.getCreateParam(this.config)
     const created = await this.rpc.create(this.MODEL, config)
     cy.log('Mock Generated')
+
     this.id = created
+    this.generated = true
     await this.afterGenerated(created, this.config)
     return created
   }
@@ -46,10 +49,12 @@ export default abstract class BaseMock<Config> implements MockItem<Config> {
     return this.config
   }
 
-  with_cy(asyncCallback: () => Promise<any>) {
+  static with_cy(asyncCallback: () => Promise<any>) {
     return cy.wrap("Mock").then({ timeout: 30000 }, () => {
       return new Cypress.Promise(resolve => {
-        asyncCallback.call(this).then(resolve)
+        asyncCallback().then((result) => {
+          resolve(result)
+        })
       })
     })
   }
@@ -62,6 +67,8 @@ export default abstract class BaseMock<Config> implements MockItem<Config> {
 
 
   async cleanup() {
+    if (!this.generated) return
+
     await this.beforeCleanup(this.config)
 
     if (this.CAN_DELETE)

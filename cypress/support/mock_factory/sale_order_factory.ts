@@ -1,6 +1,8 @@
 import MockFactory from './mock_factory';
-import { SaleOrderConfig } from '../mock/sale_order_mock';
+import SaleOrderMock, { SaleOrderConfig } from '../mock/sale_order_mock';
 
-export default class SaleOrderFactory extends MockFactory<SaleOrderConfig>{
-
+export default class SaleOrderFactory extends MockFactory<SaleOrderConfig> {
+  getMockClass() {
+    return SaleOrderMock
+  }
 }

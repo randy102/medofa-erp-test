@@ -17,6 +17,6 @@ export default class CouponProgramPage extends BasePage {
     this._input('length', length)
     this._input('nbr_coupons', number)
     this._input('prefix', prefix)
-    this._clickButton('Generate')
+    this._clickButton('Generate','generate_coupon')
   }
 }

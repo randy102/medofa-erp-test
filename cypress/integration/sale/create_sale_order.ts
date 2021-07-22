@@ -1,6 +1,7 @@
 import ProductMock from '../../support/mock/product_mock';
 import SaleOrderPage, { SaleState } from '../../support/page/sale_order_page';
 import { MockItem } from '../../support/mock/mock_item';
+import BaseMock from '../../support/mock/base_mock';
 
 const productMock: MockItem = new ProductMock()
 const page = new SaleOrderPage()
@@ -11,11 +12,11 @@ describe('Create Sale Order', function () {
   })
 
   it('should create order', function () {
-    productMock.with_cy(() => productMock.generate())
+    BaseMock.with_cy(() => productMock.generate())
     page._clickCreateButton()
     page._selectMany2one('partner_id', 'Quang Trần')
     page._clickLinkText('Add a product')
-    productMock.with_cy(() => productMock.get(['default_code'])).then(data => {
+    BaseMock.with_cy(() => productMock.get(['default_code'])).then(data => {
       page._selectTreeMany2one('product_id', 0, data['default_code'])
     })
     page._inputTree('product_uom_qty', 0, '5')

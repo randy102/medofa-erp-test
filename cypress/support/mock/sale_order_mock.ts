@@ -19,8 +19,8 @@ export default class SaleOrderMock extends BaseMock<SaleOrderConfig> {
       this.productMock = productMock
     } else {
       this.productMock = new ProductMock({ price })
-      await this.productMock.generate()
     }
+    await this.productMock.generate()
     const productData = await this.productMock.get(['product_variant_id', 'display_name', 'uom_id'])
     return {
       "picking_policy": "direct",
