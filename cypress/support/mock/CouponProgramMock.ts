@@ -1,5 +1,6 @@
-import BaseMock, { BaseConfig } from './base_mock'
+
 import random from '../utils/random';
+import { BaseConfig, BaseMock } from './BaseMock';
 
 export class CouponProgramConfig extends BaseConfig<CouponProgramDepend>{
   name?: string
@@ -9,7 +10,7 @@ export type CouponProgramDepend = {
 
 }
 
-export default class CouponProgramMock extends BaseMock<CouponProgramConfig, CouponProgramDepend>{
+export class CouponProgramMock extends BaseMock<CouponProgramConfig, CouponProgramDepend>{
   MODEL = 'sale.coupon.program'
 
   protected async getDependency(config: Partial<CouponProgramConfig>): Promise<CouponProgramDepend> {

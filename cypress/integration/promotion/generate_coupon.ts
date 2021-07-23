@@ -1,9 +1,7 @@
-import CouponProgramMock from '../../support/mock/coupon_program_mock'
 import random from '../../support/utils/random'
-import CouponProgramPage from '../../support/page/coupon_program_page'
-import SaleOrderMock from '../../support/mock/sale_order_mock'
-import SaleOrderPage from '../../support/page/sale_order_page'
-import BaseMock from '../../support/mock/base_mock';
+import { BaseMock, CouponProgramMock, SaleOrderMock } from '../../support/mock';
+import { CouponProgramPage, SaleOrderPage } from '../../support/page';
+
 
 const programName = random()
 const couponProgramMock = new CouponProgramMock({ name: programName })
@@ -25,7 +23,6 @@ describe('Generate coupon with length and prefix', function () {
     page.getNumberOfCoupon().should('contain', '1')
     page._clickButton('Coupons')
     page._getTreeCell(1, 1).invoke('text').as('coupon_code').should('have.length', 9).and('include', 'ABC')
-    cy.go('back')
   });
 
   it('should alert if running out of coupon code', function () {
@@ -45,13 +42,17 @@ describe('Generate coupon with length and prefix', function () {
 
     for (let currentCoupon = 7; currentCoupon <= 11; currentCoupon++) {
       page._clickButton('Generate Coupon')
-      page.generateCoupon('6', prefix, '1')
+      page.generateCoupon(String(13 - currentCoupon), prefix, '1')
       cy.contains(exceededCouponError).should('be.visible')
       page._clickButton('Ok')
 
       page.generateCoupon('1', prefix, '1')
       page.getNumberOfCoupon().should('contain', currentCoupon.toString())
     }
+    page._clickButton('Generate Coupon')
+    page.generateCoupon('1', prefix, '1')
+    cy.contains(exceededCouponError).should('be.visible')
+    page._clickButton('Ok')
   });
 
   it('should apply code to sale order successfully', function () {

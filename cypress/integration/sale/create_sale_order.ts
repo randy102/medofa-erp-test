@@ -1,7 +1,6 @@
-import ProductMock from '../../support/mock/product_mock';
-import SaleOrderPage, { SaleState } from '../../support/page/sale_order_page';
-import { MockItem } from '../../support/mock/mock_item';
-import BaseMock from '../../support/mock/base_mock';
+import { BaseMock, MockItem, ProductMock } from '../../support/mock';
+import { SaleOrderPage, SaleState } from '../../support/page';
+
 
 const productMock: MockItem = new ProductMock()
 const page = new SaleOrderPage()

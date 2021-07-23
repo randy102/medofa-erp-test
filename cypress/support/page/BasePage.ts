@@ -1,7 +1,7 @@
 import login from '../utils/login'
 import Chainable = Cypress.Chainable;
 
-export default abstract class BasePage {
+export abstract class BasePage {
   abstract navigate()
 
   /**
@@ -104,7 +104,9 @@ export default abstract class BasePage {
   }
 
   _findTreeGroupColumn(rowKey: string, colName: string): Chainable {
-    return this._findTreeGroupRow(rowKey).find(`tr>td.o_list_number.${colName}`)
+    return this._getTreeColumnIndex(colName).then((index) => {
+      return this._findTreeGroupRow(rowKey).children().eq(index - 2)
+    })
   }
 
   _findTreeColumn(rowKey: string, colName: string, field?: string): Chainable {

@@ -1,6 +1,6 @@
-import { MockItem } from '../mock/mock_item';
+import { MockItem } from '../mock';
 
-export default abstract class MockFactory<Config> {
+export abstract class MockFactory<Config> {
   protected mockList: MockItem<Config>[] = []
 
   constructor(configs: Config[]) {
@@ -12,8 +12,13 @@ export default abstract class MockFactory<Config> {
 
   abstract getMockClass()
 
-  generate(): Promise<number[]> {
-    return Promise.all(this.mockList?.map(mock => mock.generate()))
+  async generate(): Promise<number[]> {
+    let createdIds = []
+    for(const mock of this.mockList){
+      const created = await mock.generate()
+      createdIds.push(created)
+    }
+    return createdIds
   }
 
   cleanup(): Promise<void[]> {

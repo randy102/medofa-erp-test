@@ -1,15 +1,16 @@
 import OdooRPC from '../utils/OdooRPC'
-import { MockItem } from './mock_item';
+import { MockItem } from './MockItem';
 
-export abstract class BaseConfig<Depend>{
-  depends: Depend
+export abstract class BaseConfig<Depend> {
+  depends: Partial<Depend>
 }
 
-export default abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implements MockItem<Config> {
+export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implements MockItem<Config> {
   protected rpc: OdooRPC
   protected MODEL: string
   protected CAN_DELETE: boolean = false
 
+  private CACHE: { [key: string]: any } = {}
   private id: number
   private config: Partial<Config>
   protected dependencies: Partial<Depend>
@@ -23,6 +24,7 @@ export default abstract class BaseMock<Config extends BaseConfig<Depend>, Depend
 
   setConfig(config: Partial<Config>) {
     this.config = config || {}
+    this.config['depends'] = this.config['depends'] || {}
   }
 
   protected async beforeGenerated(config: Partial<Config>, depends: Partial<Depend>) {
@@ -33,8 +35,8 @@ export default abstract class BaseMock<Config extends BaseConfig<Depend>, Depend
 
   protected abstract getDependency(config: Partial<Config>): Promise<Depend>
 
-  private async generateDependency(){
-    for(const depends of Object.keys(this.dependencies)){
+  private async generateDependency() {
+    for (const depends of Object.keys(this.dependencies)) {
       await this.dependencies[depends].generate()
     }
   }
@@ -73,7 +75,23 @@ export default abstract class BaseMock<Config extends BaseConfig<Depend>, Depend
 
 
   async get(fields: string[]): Promise<any> {
-    const [result] = await this.rpc.read(this.MODEL, this.id, fields)
+    if (!this.id) {
+      throw Error('Mock Item is not generated yet!')
+    }
+    let result = {}
+    const fieldsToFetch = []
+    for (const field of fields) {
+      const KEY = 'field_' + field
+      if (this.existCache(KEY)) {
+        result[field] = this.getCache(KEY)
+      } else {
+        fieldsToFetch.push(field)
+      }
+    }
+    if (fieldsToFetch.length > 0) {
+      const [fetchResult] = await this.rpc.read(this.MODEL, this.id, fieldsToFetch)
+      result = { ...result, ...fetchResult }
+    }
     return result
   }
 
@@ -101,9 +119,12 @@ export default abstract class BaseMock<Config extends BaseConfig<Depend>, Depend
   protected async afterCleanup(config: Partial<Config>, depends: Partial<Depend>): Promise<void> {
   }
 
+  protected async shouldCleanup(config: Partial<Config>, depends: Partial<Depend>): Promise<boolean> {
+    return true
+  }
 
   async cleanup(cleanupDependencies = true) {
-    if (!this.id) return
+    if (!this.id || !(await this.shouldCleanup(this.config, this.dependencies))) return
 
     await this.beforeCleanup(this.config, this.dependencies)
 
@@ -114,14 +135,32 @@ export default abstract class BaseMock<Config extends BaseConfig<Depend>, Depend
 
     await this.afterCleanup(this.config, this.dependencies)
 
-    if(cleanupDependencies){
+    if (cleanupDependencies) {
       await this.cleanupDependencies()
     }
   }
 
-  async cleanupDependencies(){
-    for(const depends of Object.keys(this.dependencies)){
+  async cleanupDependencies() {
+    for (const depends of Object.keys(this.dependencies)) {
       await this.dependencies[depends].cleanup()
     }
+  }
+
+  protected getCache<T = any>(key: any): T {
+    key = String(key)
+    if (key in this.CACHE) {
+      return this.CACHE[key]
+    }
+    return undefined
+  }
+
+  protected setCache(key: any, value: any) {
+    key = String(key)
+    this.CACHE[key] = value
+  }
+
+  protected existCache(key: any): boolean {
+    key = String(key)
+    return key in this.CACHE
   }
 }

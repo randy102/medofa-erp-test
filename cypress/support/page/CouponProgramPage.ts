@@ -1,6 +1,6 @@
-import BasePage from './base_page'
+import { BasePage } from './BasePage'
 
-export default class CouponProgramPage extends BasePage {
+export class CouponProgramPage extends BasePage {
   navigate() {
     super._navigate()
     this._clickRootMenu('sale.sale_menu_root')

@@ -1,5 +1,6 @@
-import BaseMock, { BaseConfig } from './base_mock'
-import ProductMock from './product_mock'
+import { BaseConfig, BaseMock }  from './BaseMock'
+import { ProductMock } from './ProductMock';
+
 
 export class SaleOrderConfig extends BaseConfig<SaleOrderDepends> {
   price?: number
@@ -11,7 +12,7 @@ export type SaleOrderDepends = {
   product?: ProductMock
 }
 
-export default class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
+export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
   MODEL = 'sale.order'
   CAN_DELETE = true
 
@@ -49,7 +50,21 @@ export default class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDe
       case 'Cancelled':
         await this.cancel()
         break
+      case 'Progressing':
+        await this.process()
+        break
     }
+  }
+
+  async process(): Promise<void>{
+    await this.confirm()
+    const findShipPickingDomain = [
+      ['sale_id','=',this.getId()],
+      ['picking_code','=','SHIP']
+    ]
+    const [shipPicking] = await this.rpc.search('stock.picking', findShipPickingDomain, ['id'])
+    const immediateTransferId = await this.rpc.create('stock.immediate.transfer', {pick_ids: [[4, shipPicking.id]]})
+    await this.rpc.call('stock.immediate.transfer','process',[immediateTransferId])
   }
 
   async confirm(): Promise<void> {
@@ -71,5 +86,9 @@ export default class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDe
       const { picking_ids } = await this.get(['picking_ids'])
       await this.rpc.unlink('stock.picking', picking_ids)
     }
+  }
+
+  protected async shouldCleanup(config: Partial<SaleOrderConfig>, depends: Partial<SaleOrderDepends>): Promise<boolean> {
+    return config.state != 'Progressing'
   }
 }

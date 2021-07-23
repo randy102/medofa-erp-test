@@ -1,4 +1,4 @@
-import BasePage from './base_page'
+import { BasePage } from './BasePage'
 
 export enum SaleState {
   DRAFT = 'draft',
@@ -7,7 +7,7 @@ export enum SaleState {
   CANCELED = 'cancel'
 }
 
-export default class SaleOrderPage extends BasePage{
+export class SaleOrderPage extends BasePage{
   navigate() {
     super._navigate()
     this._clickRootMenu('sale.sale_menu_root')

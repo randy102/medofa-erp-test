@@ -1,6 +1,7 @@
 import Odoo = require("odoo-xmlrpc");
 
 export default class OdooRPC {
+  private context
   static instance
   odoo
 
@@ -49,15 +50,32 @@ export default class OdooRPC {
     return this.call(model, 'search_read', domain, fields, 0, limit)
   }
 
+  async getCompanyId(): Promise<number>{
+    const [user] = await this.search('res.users',[['partner_id.id','=',Cypress.env('erpPartnerId')]], ['company_id'])
+    return user['company_id'][0]
+  }
+
+  with_context(context: object): OdooRPC{
+    this.context = context
+    return this
+  }
+
   call(model, method, ...params): Promise<any> {
     const odooInstance = this.odoo
+    let args = []
+    args.push(params)
+    if (this.context){
+      args.push({'context': this.context})
+      this.context = undefined
+    }
+
     return new Promise((resolve, reject) => {
       odooInstance.connect(function (err) {
         if (err) {
           console.log(err)
           reject(err)
         }
-        odooInstance.execute_kw(model, method, [params], function (err, value) {
+        odooInstance.execute_kw(model, method, args, function (err, value) {
           if (err) {
             console.log(err)
             reject(err)
