@@ -1,0 +1,4 @@
+export enum CK{
+    INB_STOCK_LOCATION_ID,
+    MAIN_STOCK_KHD_LOCATION_ID,
+}

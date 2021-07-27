@@ -2,7 +2,7 @@ import Odoo = require("odoo-xmlrpc");
 
 export default class OdooRPC {
   private context
-  static instance
+  private static instance
   odoo
 
   constructor() {

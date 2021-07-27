@@ -1,5 +1,6 @@
-import { BaseConfig, BaseMock } from './BaseMock'
+import {BaseConfig, BaseMock} from './BaseMock'
 import random from '../utils/random';
+import {CK, GlobalCache} from "../cache";
 
 export class ProductConfig extends BaseConfig<ProductDepend> {
   name?: string
@@ -33,12 +34,12 @@ export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
 
   protected async afterGenerated(id: number, { mainQty, inboundQty }: Partial<ProductConfig>): Promise<void> {
     if (!isNaN(mainQty) && mainQty > 0) {
-      const mainLocationId = await this.getMainLocationId()
+      const mainLocationId = await GlobalCache.get(CK.MAIN_STOCK_KHD_LOCATION_ID)
       await this.generateLotQuantity(mainLocationId, random(), mainQty)
     }
 
     if (!isNaN(inboundQty) && inboundQty > 0) {
-      const inboundLocationId = await this.getInboundLocationId()
+      const inboundLocationId = await GlobalCache.get(CK.INB_STOCK_LOCATION_ID)
       await this.generateLotQuantity(inboundLocationId, random(), inboundQty)
     }
   }
@@ -63,24 +64,5 @@ export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
       })
     }
     await this.rpc.with_context({'inventory_mode': true}).call('stock.quant','create', val)
-  }
-
-  async getMainLocationId(): Promise<number> {
-    if (this.existCache(CacheKey.MAIN_LOCATION_ID)) return this.getCache<number>(CacheKey.MAIN_LOCATION_ID)
-    const locationId = await this.findLocation('MAIN/Stock/KHD')
-    this.setCache(CacheKey.MAIN_LOCATION_ID, locationId)
-    return locationId
-  }
-
-  async getInboundLocationId(): Promise<number> {
-    if (this.existCache(CacheKey.INB_LOCATION_ID)) return this.getCache<number>(CacheKey.INB_LOCATION_ID)
-    const locationId = await this.findLocation('INB/Stock')
-    this.setCache(CacheKey.INB_LOCATION_ID, locationId)
-    return locationId
-  }
-
-  async findLocation(pattern: string): Promise<number> {
-    const [location] = await this.rpc.search('stock.location', [['complete_name', 'like', pattern]], ['id'])
-    return location['id']
   }
 }
