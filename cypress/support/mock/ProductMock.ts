@@ -5,7 +5,8 @@ import {randomString} from "../utils";
 export class ProductConfig extends BaseConfig<ProductDepend> {
   name?: string
   price?: number
-  mainQty?: number
+  mainHdQty?: number
+  mainKhdQty?: number
   inboundQty?: number
   scrapQty?: number
 }
@@ -27,10 +28,15 @@ export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
     }
   }
 
-  protected async afterGenerated(id: number, { mainQty, inboundQty, scrapQty }: Partial<ProductConfig>): Promise<void> {
-    if (!isNaN(mainQty) && mainQty > 0) {
-      const mainLocationId = await GlobalCache.get(CK.MAIN_STOCK_KHD_LOCATION_ID)
-      await this.generateLotQuantity(mainLocationId, randomString(), mainQty)
+  protected async afterGenerated(id: number, { mainHdQty, mainKhdQty, inboundQty, scrapQty }: Partial<ProductConfig>): Promise<void> {
+    if (!isNaN(mainHdQty) && mainHdQty > 0) {
+      const mainKHDLocationId = await GlobalCache.get(CK.MAIN_STOCK_KHD_LOCATION_ID)
+      await this.generateLotQuantity(mainKHDLocationId, randomString(), mainHdQty)
+    }
+
+    if (!isNaN(mainKhdQty) && mainKhdQty > 0) {
+      const mainHDLocationId = await GlobalCache.get(CK.MAIN_STOCK_HD_LOCATION_ID)
+      await this.generateLotQuantity(mainHDLocationId, randomString(), mainKhdQty)
     }
 
     if (!isNaN(inboundQty) && inboundQty > 0) {

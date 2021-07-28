@@ -4,7 +4,8 @@ import { OrderLinePage } from '../../support/page';
 import { randomInt } from "../../support/utils";
 
 const CONST = {
-  mainQty: randomInt(20, 30),
+  mainKhdQty: randomInt(10, 30),
+  mainHdQty: randomInt(10, 30),
   inboundQty: randomInt(),
   scrapQty: randomInt(),
   receivedQty: randomInt(),
@@ -14,7 +15,14 @@ const CONST = {
   purchaseConfirmedQty: randomInt()
 }
 const page = new OrderLinePage()
-const productMock = new ProductMock({mainQty: CONST.mainQty, inboundQty: CONST.inboundQty, scrapQty: CONST.scrapQty})
+
+const productMock = new ProductMock({
+  mainHdQty: CONST.mainHdQty,
+  mainKhdQty: CONST.mainKhdQty,
+  inboundQty: CONST.inboundQty,
+  scrapQty: CONST.scrapQty
+})
+
 const mock = new SaleOrderFactory([
   {depends: {product: productMock}, state: 'Received', qty: CONST.receivedQty},
   {depends: {product: productMock}, state: 'Confirmed', qty: CONST.saleConfirmedQty},
@@ -48,7 +56,7 @@ describe('Order Line Report', function () {
       page._inputSearch(default_code, 'Product')
       page._findTreeGroupRow(default_code).should('be.visible')
 
-      const realMainQty = CONST.mainQty - CONST.progressingQty - CONST.saleConfirmedQty
+      const realMainQty = CONST.mainHdQty + CONST.mainKhdQty - CONST.progressingQty - CONST.saleConfirmedQty
       page._findTreeGroupColumn(default_code, 'main_stock_qty').should('contain', realMainQty)
       page._findTreeGroupColumn(default_code, 'waiting_shipping_qty').should('contain', CONST.saleConfirmedQty)
       page._findTreeGroupColumn(default_code, 'pick_pack_out_qty').should('contain', CONST.progressingQty)

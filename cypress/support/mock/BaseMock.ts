@@ -66,7 +66,7 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
     const config = await this.getCreateParam(this.config, this.dependencies)
 
     const created = await this.rpc.create(this.MODEL, config)
-    cy.log('Mock Generated')
+    cy.log(`${this.constructor.name} Generated`)
 
     this.id = created
     await this.afterGenerated(created, this.config, this.dependencies)
