@@ -1,8 +1,9 @@
 import { BaseMock, MockItem, ProductMock } from '../../support/mock';
 import { SaleOrderPage, SaleState } from '../../support/page';
+import { randomString } from "../../support/utils";
 
 
-const productMock: MockItem = new ProductMock()
+const productMock = new ProductMock()
 const page = new SaleOrderPage()
 
 describe('Create Sale Order', function () {
@@ -40,7 +41,7 @@ describe('Create Sale Order', function () {
     page._findTreeColumn(this.order_name, 'flag_db_str').should('contain', 'Received')
   });
 
-  it('should confirm order', function () {
+  it('should show product not fulfilled error when confirm order ', function () {
     page._clickTreeItem(this.order_name)
 
     page._clickButton('Confirm', 'action_confirm_with_check_stock')
@@ -49,9 +50,16 @@ describe('Create Sale Order', function () {
     cy.contains('.modal-title', 'Confirm Order').should('not.exist')
     page.getStateButton(SaleState.RECEIVED).should('have.attr', 'aria-checked', 'true')
 
+    page._navigateMainView()
+    page._findTreeColumn(this.order_name, 'flag_db').should('contain', '15')
+    page._findTreeColumn(this.order_name, 'flag_db_str').should('contain', 'Received')
+  });
+
+  it('should confirm order successfully when product has enough stock', function () {
+    BaseMock.with_cy(() => productMock.generateMainKhdQty(randomString(), 5) )
+    page._clickTreeItem(this.order_name)
+
     page._clickButton('Confirm', 'action_confirm_with_check_stock')
-    cy.contains('.modal-title', 'Confirm Order').should('be.visible')
-    cy.contains('.modal-content button[name="action_confirm"]', 'Confirm').click()
     page.getStateButton(SaleState.CONFIRMED).should('have.attr', 'aria-checked', 'true')
 
     page._navigateMainView()

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cypress run --record --key 37bf705d-55fd-4edd-a737-e765b34d9984",
     "cypress:open": "cypress open"
   },
   "keywords": [],

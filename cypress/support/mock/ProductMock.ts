@@ -30,13 +30,12 @@ export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
 
   protected async afterGenerated(id: number, { mainHdQty, mainKhdQty, inboundQty, scrapQty }: Partial<ProductConfig>): Promise<void> {
     if (!isNaN(mainHdQty) && mainHdQty > 0) {
-      const mainKHDLocationId = await GlobalCache.get(CK.MAIN_STOCK_KHD_LOCATION_ID)
-      await this.generateLotQuantity(mainKHDLocationId, randomString(), mainHdQty)
+      const mainHDLocationId = await GlobalCache.get(CK.MAIN_STOCK_HD_LOCATION_ID)
+      await this.generateLotQuantity(mainHDLocationId, randomString(), mainHdQty)
     }
 
     if (!isNaN(mainKhdQty) && mainKhdQty > 0) {
-      const mainHDLocationId = await GlobalCache.get(CK.MAIN_STOCK_HD_LOCATION_ID)
-      await this.generateLotQuantity(mainHDLocationId, randomString(), mainKhdQty)
+      await this.generateMainKhdQty(randomString(), mainKhdQty)
     }
 
     if (!isNaN(inboundQty) && inboundQty > 0) {
@@ -48,6 +47,11 @@ export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
       const scrapLocationId = await GlobalCache.get(CK.SCRAP_STOCK_LOCATION_ID)
       await this.generateLotQuantity(scrapLocationId, randomString(), scrapQty)
     }
+  }
+
+  async generateMainKhdQty(lot: number | string, qty: number){
+    const mainKHDLocationId = await GlobalCache.get(CK.MAIN_STOCK_KHD_LOCATION_ID)
+    await this.generateLotQuantity(mainKHDLocationId, randomString(), qty)
   }
 
   async generateLotQuantity(locationId: number, lot: number | string, qty: number): Promise<void> {
