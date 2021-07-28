@@ -36,11 +36,11 @@ export class OdooRPC {
   }
 
   archive(model, id): Promise<void> {
-    return this.write(model, id, { 'active': false })
+    return this.write(model, id, {'active': false})
   }
 
   unlink(model, id): Promise<void> {
-    if (!Array.isArray(id)){
+    if (!Array.isArray(id)) {
       id = [id]
     }
     return this.call(model, 'unlink', id)
@@ -50,12 +50,12 @@ export class OdooRPC {
     return this.call(model, 'search_read', domain, fields, 0, limit)
   }
 
-  async getCompanyId(): Promise<number>{
-    const [user] = await this.search('res.users',[['partner_id.id','=',Cypress.env('erpPartnerId')]], ['company_id'])
+  async getCompanyId(): Promise<number> {
+    const [user] = await this.search('res.users', [['partner_id.id', '=', Cypress.env('erpPartnerId')]], ['company_id'])
     return user['company_id'][0]
   }
 
-  with_context(context: object): OdooRPC{
+  with_context(context: object): OdooRPC {
     this.context = context
     return this
   }
@@ -64,11 +64,11 @@ export class OdooRPC {
     const odooInstance = this.odoo
     let args = []
     args.push(params)
-    if (this.context){
+    if (this.context) {
       args.push({'context': this.context})
       this.context = undefined
     }
-    console.log(model, method, params)
+
     return new Promise((resolve, reject) => {
       odooInstance.connect(function (err) {
         if (err) {
@@ -79,9 +79,9 @@ export class OdooRPC {
           if (err) {
             console.log(err)
             reject(err)
-          } else{
+          } else {
             resolve(value)
-            console.log(`Executed Successfully: ${model}.${method}(${JSON.stringify(params)}) => ${value}`)
+            console.log(`------------------\nExecuted Successfully: ${model}.${method}(${JSON.stringify(params)})\n => ${JSON.stringify(value)}`)
           }
         });
       });

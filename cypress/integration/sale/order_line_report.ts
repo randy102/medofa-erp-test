@@ -1,27 +1,28 @@
 import { BaseMock, ProductMock, PurchaseOrderMock } from '../../support/mock';
 import { SaleOrderFactory } from '../../support/mock_factory';
 import { OrderLinePage } from '../../support/page';
+import { randomInt } from "../../support/utils";
 
 const CONST = {
-  mainQty: 5,
-  inboundQty: 5,
-  scrapQty: 5,
-  receivedQty: 5,
-  saleConfirmedQty: 5,
-  cancelledQty: 5,
-  progressingQty: 2,
-  purchaseConfirmedQty: 10
+  mainQty: randomInt(10, 20),
+  inboundQty: randomInt(),
+  scrapQty: randomInt(),
+  receivedQty: randomInt(),
+  saleConfirmedQty: randomInt(0, 10),
+  cancelledQty: randomInt(),
+  progressingQty: randomInt(0, 10),
+  purchaseConfirmedQty: randomInt()
 }
 const page = new OrderLinePage()
-const productMock = new ProductMock({ mainQty: CONST.mainQty, inboundQty: CONST.inboundQty, scrapQty: CONST.scrapQty })
+const productMock = new ProductMock({mainQty: CONST.mainQty, inboundQty: CONST.inboundQty, scrapQty: CONST.scrapQty})
 const mock = new SaleOrderFactory([
-  { depends: { product: productMock }, state: 'Received', qty: CONST.receivedQty },
-  { depends: { product: productMock }, state: 'Confirmed', qty: CONST.saleConfirmedQty },
-  { depends: { product: productMock }, state: 'Cancelled', qty: CONST.cancelledQty },
-  { depends: { product: productMock }, state: 'Progressing', qty: CONST.progressingQty },
+  {depends: {product: productMock}, state: 'Received', qty: CONST.receivedQty},
+  {depends: {product: productMock}, state: 'Confirmed', qty: CONST.saleConfirmedQty},
+  {depends: {product: productMock}, state: 'Cancelled', qty: CONST.cancelledQty},
+  {depends: {product: productMock}, state: 'Progressing', qty: CONST.progressingQty},
 ])
 const purchaseMock = new PurchaseOrderMock({
-  depends: { product: productMock },
+  depends: {product: productMock},
   state: 'Confirmed', qty: CONST.purchaseConfirmedQty
 })
 
@@ -43,10 +44,12 @@ describe('Order Line Report', function () {
   });
 
   it.only('should display product quantities correctly', function () {
-    BaseMock.with_cy(() => productMock.get(['default_code'])).then(({ default_code }) => {
+    BaseMock.with_cy(() => productMock.get(['default_code'])).then(({default_code}) => {
       page._inputSearch(default_code, 'Product')
       page._findTreeGroupRow(default_code).should('be.visible')
-      page._findTreeGroupColumn(default_code, 'main_stock_qty').should('contain', CONST.mainQty - CONST.progressingQty)
+
+      const realMainQty = CONST.mainQty - CONST.progressingQty - CONST.saleConfirmedQty
+      page._findTreeGroupColumn(default_code, 'main_stock_qty').should('contain', realMainQty)
       page._findTreeGroupColumn(default_code, 'waiting_shipping_qty').should('contain', CONST.saleConfirmedQty)
       page._findTreeGroupColumn(default_code, 'pick_pack_out_qty').should('contain', CONST.progressingQty)
       page._findTreeGroupColumn(default_code, 'waiting_receive_qty').should('contain', CONST.purchaseConfirmedQty)
