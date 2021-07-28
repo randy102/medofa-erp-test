@@ -1,9 +1,9 @@
-import random from '../../support/utils/random'
 import { BaseMock, CouponProgramMock, SaleOrderMock } from '../../support/mock';
 import { CouponProgramPage, SaleOrderPage } from '../../support/page';
+import {randomString} from "../../support/utils";
 
 
-const programName = random()
+const programName = randomString()
 const couponProgramMock = new CouponProgramMock({ name: programName })
 const saleOrderMock = new SaleOrderMock()
 const page = new CouponProgramPage()
@@ -26,7 +26,7 @@ describe('Generate coupon with length and prefix', function () {
   });
 
   it('should alert if running out of coupon code', function () {
-    const prefix = random()
+    const prefix = randomString()
     const exceededCouponError = 'Coupon Code Exceeded! Please change another prefix, length or number of coupons!'
     const maxCouponError = 'Can only generate maximum 10 coupons!'
 

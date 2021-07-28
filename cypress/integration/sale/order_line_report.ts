@@ -2,18 +2,27 @@ import { BaseMock, ProductMock, PurchaseOrderMock } from '../../support/mock';
 import { SaleOrderFactory } from '../../support/mock_factory';
 import { OrderLinePage } from '../../support/page';
 
-
+const CONST = {
+  mainQty: 5,
+  inboundQty: 5,
+  scrapQty: 5,
+  receivedQty: 5,
+  saleConfirmedQty: 5,
+  cancelledQty: 5,
+  progressingQty: 2,
+  purchaseConfirmedQty: 10
+}
 const page = new OrderLinePage()
-const productMock = new ProductMock({ mainQty: 10, inboundQty: 5 })
+const productMock = new ProductMock({ mainQty: CONST.mainQty, inboundQty: CONST.inboundQty, scrapQty: CONST.scrapQty })
 const mock = new SaleOrderFactory([
-  { depends: { product: productMock }, state: 'Received', qty: 5 },
-  { depends: { product: productMock }, state: 'Confirmed', qty: 5 },
-  { depends: { product: productMock }, state: 'Cancelled', qty: 5 },
-  { depends: { product: productMock }, state: 'Progressing', qty: 2 },
+  { depends: { product: productMock }, state: 'Received', qty: CONST.receivedQty },
+  { depends: { product: productMock }, state: 'Confirmed', qty: CONST.saleConfirmedQty },
+  { depends: { product: productMock }, state: 'Cancelled', qty: CONST.cancelledQty },
+  { depends: { product: productMock }, state: 'Progressing', qty: CONST.progressingQty },
 ])
 const purchaseMock = new PurchaseOrderMock({
   depends: { product: productMock },
-  state: 'Confirmed', qty: 10
+  state: 'Confirmed', qty: CONST.purchaseConfirmedQty
 })
 
 describe('Order Line Report', function () {
@@ -37,11 +46,11 @@ describe('Order Line Report', function () {
     BaseMock.with_cy(() => productMock.get(['default_code'])).then(({ default_code }) => {
       page._inputSearch(default_code, 'Product')
       page._findTreeGroupRow(default_code).should('be.visible')
-      page._findTreeGroupColumn(default_code, 'main_stock_qty').should('contain', '3')
-      page._findTreeGroupColumn(default_code, 'waiting_shipping_qty').should('contain', '5')
-      page._findTreeGroupColumn(default_code, 'pick_pack_out_qty').should('contain', '2')
-      page._findTreeGroupColumn(default_code, 'waiting_receive_qty').should('contain', '10')
-      page._findTreeGroupColumn(default_code, 'inbound_qty').should('contain', '5')
+      page._findTreeGroupColumn(default_code, 'main_stock_qty').should('contain', CONST.mainQty - CONST.progressingQty)
+      page._findTreeGroupColumn(default_code, 'waiting_shipping_qty').should('contain', CONST.saleConfirmedQty)
+      page._findTreeGroupColumn(default_code, 'pick_pack_out_qty').should('contain', CONST.progressingQty)
+      page._findTreeGroupColumn(default_code, 'waiting_receive_qty').should('contain', CONST.purchaseConfirmedQty)
+      page._findTreeGroupColumn(default_code, 'inbound_qty').should('contain', CONST.inboundQty)
     })
   });
 

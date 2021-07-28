@@ -1,6 +1,6 @@
 import Odoo = require("odoo-xmlrpc");
 
-export default class OdooRPC {
+export class OdooRPC {
   private context
   private static instance
   odoo
@@ -68,7 +68,7 @@ export default class OdooRPC {
       args.push({'context': this.context})
       this.context = undefined
     }
-
+    console.log(model, method, params)
     return new Promise((resolve, reject) => {
       odooInstance.connect(function (err) {
         if (err) {

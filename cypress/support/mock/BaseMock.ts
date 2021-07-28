@@ -1,5 +1,5 @@
-import OdooRPC from '../utils/OdooRPC'
-import { MockItem } from './MockItem';
+import {OdooRPC} from '../utils'
+import {MockItem} from './MockItem';
 
 export abstract class BaseConfig<Depend> {
   depends: Partial<Depend>
@@ -90,7 +90,7 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
     }
     if (fieldsToFetch.length > 0) {
       const [fetchResult] = await this.rpc.read(this.MODEL, this.id, fieldsToFetch)
-      result = { ...result, ...fetchResult }
+      result = {...result, ...fetchResult}
     }
     return result
   }
@@ -104,7 +104,7 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
   }
 
   static with_cy(asyncCallback: () => Promise<any>) {
-    return cy.wrap("Mock").then({ timeout: 30000 }, () => {
+    return cy.wrap("Mock").then({timeout: 30000}, () => {
       return new Cypress.Promise(resolve => {
         asyncCallback().then((result) => {
           resolve(result)

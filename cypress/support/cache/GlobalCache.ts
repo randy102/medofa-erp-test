@@ -1,5 +1,5 @@
 import {CK} from "./Keys";
-import OdooRPC from "../utils/OdooRPC";
+import {OdooRPC} from "../utils";
 
 export class GlobalCache{
     static CACHE_PULL = new Map<CK,(rpc: OdooRPC) => Promise<any>>()

@@ -1,21 +1,16 @@
 import {BaseConfig, BaseMock} from './BaseMock'
-import random from '../utils/random';
 import {CK, GlobalCache} from "../cache";
+import {randomString} from "../utils";
 
 export class ProductConfig extends BaseConfig<ProductDepend> {
   name?: string
   price?: number
   mainQty?: number
   inboundQty?: number
+  scrapQty?: number
 }
 
 export type ProductDepend = {}
-
-enum CacheKey {
-  MAIN_LOCATION_ID,
-  ADJUSTMENT_LOCATION_ID,
-  INB_LOCATION_ID
-}
 
 export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
   MODEL = 'product.template'
@@ -27,20 +22,25 @@ export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
 
   protected async getCreateParam({ price, name }: ProductConfig): Promise<object> {
     return {
-      name: name || random(),
+      name: name || randomString(),
       list_price: price || 100000
     }
   }
 
-  protected async afterGenerated(id: number, { mainQty, inboundQty }: Partial<ProductConfig>): Promise<void> {
+  protected async afterGenerated(id: number, { mainQty, inboundQty, scrapQty }: Partial<ProductConfig>): Promise<void> {
     if (!isNaN(mainQty) && mainQty > 0) {
       const mainLocationId = await GlobalCache.get(CK.MAIN_STOCK_KHD_LOCATION_ID)
-      await this.generateLotQuantity(mainLocationId, random(), mainQty)
+      await this.generateLotQuantity(mainLocationId, randomString(), mainQty)
     }
 
     if (!isNaN(inboundQty) && inboundQty > 0) {
       const inboundLocationId = await GlobalCache.get(CK.INB_STOCK_LOCATION_ID)
-      await this.generateLotQuantity(inboundLocationId, random(), inboundQty)
+      await this.generateLotQuantity(inboundLocationId, randomString(), inboundQty)
+    }
+
+    if (!isNaN(scrapQty) && scrapQty > 0){
+      const scrapLocationId = await GlobalCache.get(CK.SCRAP_STOCK_LOCATION_ID)
+      await this.generateLotQuantity(scrapLocationId, randomString(), scrapQty)
     }
   }
 

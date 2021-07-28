@@ -1,4 +1,4 @@
-import login from '../utils/login'
+import {login} from '../utils'
 import Chainable = Cypress.Chainable;
 
 export abstract class BasePage {

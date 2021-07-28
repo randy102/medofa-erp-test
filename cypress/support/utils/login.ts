@@ -1,11 +1,11 @@
-export default function login(){
+export function login() {
   cy.request({
     method: 'GET',
     url: '/web/session/authenticate',
-    body:{
+    body: {
       "jsonrpc": "2.0",
       "params": {
-        "db":Cypress.env('erpDB'),
+        "db": Cypress.env('erpDB'),
         "login": Cypress.env('erpUsername'),
         "password": Cypress.env('erpPassword')
       }
