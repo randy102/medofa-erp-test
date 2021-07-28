@@ -4,7 +4,7 @@ import { OrderLinePage } from '../../support/page';
 import { randomInt } from "../../support/utils";
 
 const CONST = {
-  mainQty: randomInt(10, 20),
+  mainQty: randomInt(20, 30),
   inboundQty: randomInt(),
   scrapQty: randomInt(),
   receivedQty: randomInt(),

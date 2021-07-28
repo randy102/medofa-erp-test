@@ -1,13 +1,15 @@
 import Odoo = require("odoo-xmlrpc");
+import { createDeflateRaw } from "zlib";
 
 export class OdooRPC {
   private context
   private static instance
-  odoo
+  private static odoo
+  private static connected = false
 
   constructor() {
     console.log('OdooRPC instance created.')
-    this.odoo = new Odoo({
+    OdooRPC.odoo = new Odoo({
       url: Cypress.config('baseUrl'),
       port: Cypress.env('erpPort'),
       db: Cypress.env('erpDB'),
@@ -60,30 +62,40 @@ export class OdooRPC {
     return this
   }
 
-  call(model, method, ...params): Promise<any> {
-    const odooInstance = this.odoo
+  static async connect(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.odoo.connect((error) => {
+        if (error) reject()
+        else {
+          resolve()
+          OdooRPC.connected = true
+          console.log('OdooRPC connected.')
+        }
+      })
+    })
+  }
+
+  async call(model, method, ...params): Promise<any> {
+    const odooInstance = OdooRPC.odoo
     let args = []
     args.push(params)
     if (this.context) {
       args.push({'context': this.context})
       this.context = undefined
     }
+    if (!OdooRPC.connected) {
+      await OdooRPC.connect()
+    }
 
-    return new Promise((resolve, reject) => {
-      odooInstance.connect(function (err) {
+    return new Promise(async (resolve, reject) => {
+      odooInstance.execute_kw(model, method, args, function (err, value) {
         if (err) {
           console.log(err)
           reject(err)
+        } else {
+          resolve(value)
+          console.log(`Executed: ${model}.${method}\nParams: ${JSON.stringify(params)}\n=> ${JSON.stringify(value)}`)
         }
-        odooInstance.execute_kw(model, method, args, function (err, value) {
-          if (err) {
-            console.log(err)
-            reject(err)
-          } else {
-            resolve(value)
-            console.log(`------------------\nExecuted Successfully: ${model}.${method}(${JSON.stringify(params)})\n => ${JSON.stringify(value)}`)
-          }
-        });
       });
     })
   }
