@@ -1,5 +1,4 @@
 import Odoo = require("odoo-xmlrpc");
-import { createDeflateRaw } from "zlib";
 
 export class OdooRPC {
   private context
@@ -75,6 +74,20 @@ export class OdooRPC {
     })
   }
 
+   private execute(model, method, args){
+    return new Promise((resolve, reject) => {
+      OdooRPC.odoo.execute_kw(model, method, args, (err, value) => {
+        if (err) {
+          console.log(err)
+          reject(err)
+        } else {
+          resolve(value)
+          console.log(`Executed: ${model}.${method}\nParams: ${JSON.stringify(args)}\n=> ${JSON.stringify(value)}`)
+        }
+      });
+    })
+  }
+
   async call(model, method, ...params): Promise<any> {
     const odooInstance = OdooRPC.odoo
     let args = []
@@ -87,16 +100,6 @@ export class OdooRPC {
       await OdooRPC.connect()
     }
 
-    return new Promise(async (resolve, reject) => {
-      odooInstance.execute_kw(model, method, args, function (err, value) {
-        if (err) {
-          console.log(err)
-          reject(err)
-        } else {
-          resolve(value)
-          console.log(`Executed: ${model}.${method}\nParams: ${JSON.stringify(params)}\n=> ${JSON.stringify(value)}`)
-        }
-      });
-    })
+    return this.execute(model, method, args)
   }
 }

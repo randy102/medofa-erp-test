@@ -60,6 +60,7 @@ describe('Create Sale Order', function () {
     page._clickTreeItem(this.order_name)
 
     page._clickButton('Confirm', 'action_confirm_with_check_stock')
+    cy.wait(2000)
     page.getStateButton(SaleState.CONFIRMED).should('have.attr', 'aria-checked', 'true')
 
     page._navigateMainView()
@@ -96,8 +97,4 @@ describe('Create Sale Order', function () {
     page._clickButton('Ok')
     page._findTreeRow(this.order_name).should('not.exist')
   });
-
-  after(() => {
-    productMock.cleanup()
-  })
 });
