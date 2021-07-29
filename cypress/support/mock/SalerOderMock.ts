@@ -51,12 +51,12 @@ export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
         await this.cancel()
         break
       case 'Progressing':
-        await this.process()
+        await this.processShip()
         break
     }
   }
 
-  async process(): Promise<void>{
+  async processShip(): Promise<void>{
     await this.confirm()
     const findShipPickingDomain = [
       ['sale_id','=',this.getId()],
