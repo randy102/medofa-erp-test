@@ -17,6 +17,14 @@ export class OdooRPC {
     });
   }
 
+  static getPartnerId(): number {
+    return +Cypress.env('erpPartnerId')
+  }
+
+  static getPartnerName(): string {
+    return Cypress.env('erpPartnerName')
+  }
+
   static getInstance(): OdooRPC {
     if (!this.instance) {
       this.instance = new OdooRPC()

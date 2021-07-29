@@ -1,6 +1,6 @@
-import { BaseMock, CouponProgramMock, SaleOrderMock } from '../../support/mock';
+import { CouponProgramMock, SaleOrderMock } from '../../support/mock';
 import { CouponProgramPage, SaleOrderPage } from '../../support/page';
-import {randomString} from "../../support/utils";
+import { cy_wrap, randomString } from "../../support/utils";
 
 
 const programName = randomString()
@@ -11,7 +11,7 @@ const salePage = new SaleOrderPage()
 
 describe('Generate coupon with length and prefix', function () {
   it('should generate coupon code successfully', function () {
-    BaseMock.with_cy(() => couponProgramMock.generate())
+    cy_wrap(() => couponProgramMock.generate())
     page.navigate()
     page._clickTreeItem(programName)
 
@@ -56,10 +56,10 @@ describe('Generate coupon with length and prefix', function () {
   });
 
   it('should apply code to sale order successfully', function () {
-    BaseMock.with_cy(() => saleOrderMock.generate())
+    cy_wrap(() => saleOrderMock.generate())
     salePage.navigate()
 
-    BaseMock.with_cy(() => saleOrderMock.get(['name'])).then(data => {
+    cy_wrap(() => saleOrderMock.get(['name'])).then(data => {
       salePage._clickTreeItem(data['name'])
       salePage._clickButton('Coupon')
       salePage._input('coupon_code', this['coupon_code'])

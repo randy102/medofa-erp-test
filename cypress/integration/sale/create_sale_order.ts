@@ -1,6 +1,6 @@
-import { BaseMock, MockItem, ProductMock } from '../../support/mock';
+import { ProductMock } from '../../support/mock';
 import { SaleOrderPage, SaleState } from '../../support/page';
-import { randomString } from "../../support/utils";
+import { cy_wrap, OdooRPC, randomString } from "../../support/utils";
 
 
 const productMock = new ProductMock()
@@ -12,11 +12,11 @@ describe('Create Sale Order', function () {
   })
 
   it('should create order', function () {
-    BaseMock.with_cy(() => productMock.generate())
+    cy_wrap(() => productMock.generate())
     page._clickCreateButton()
-    page._selectMany2one('partner_id', 'Quang Trần')
+    page._selectMany2one('partner_id', OdooRPC.getPartnerName())
     page._clickLinkText('Add a product')
-    BaseMock.with_cy(() => productMock.get(['default_code'])).then(data => {
+    cy_wrap(() => productMock.get(['default_code'])).then(data => {
       page._selectTreeMany2one('product_id', 0, data['default_code'])
     })
     page._inputTree('product_uom_qty', 0, '5')
@@ -56,7 +56,7 @@ describe('Create Sale Order', function () {
   });
 
   it('should confirm order successfully when product has enough stock', function () {
-    BaseMock.with_cy(() => productMock.generateMainKhdQty(randomString(), 5) )
+    cy_wrap(() => productMock.generateMainKhdQty(randomString(), 5))
     page._clickTreeItem(this.order_name)
 
     page._clickButton('Confirm', 'action_confirm_with_check_stock')

@@ -1,7 +1,7 @@
-import { BaseMock, ProductMock, PurchaseOrderMock } from '../../support/mock';
+import { ProductMock, PurchaseOrderMock } from '../../support/mock';
 import { SaleOrderFactory } from '../../support/mock_factory';
 import { OrderLinePage } from '../../support/page';
-import { randomInt } from "../../support/utils";
+import { cy_wrap, randomInt } from "../../support/utils";
 
 const CONST = {
   mainKhdQty: randomInt(10, 30),
@@ -36,7 +36,7 @@ const purchaseMock = new PurchaseOrderMock({
 
 describe('Order Line Report', function () {
   before(() => {
-    BaseMock.with_cy(async () => {
+    cy_wrap(async () => {
       await mock.generate()
       await purchaseMock.generate()
     })
@@ -52,7 +52,7 @@ describe('Order Line Report', function () {
   });
 
   it.only('should display product quantities correctly', function () {
-    BaseMock.with_cy(() => productMock.get(['default_code'])).then(({default_code}) => {
+    cy_wrap(() => productMock.get(['default_code'])).then(({default_code}) => {
       page._inputSearch(default_code, 'Product')
       page._findTreeGroupRow(default_code).should('be.visible')
 

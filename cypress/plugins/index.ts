@@ -27,5 +27,6 @@ module.exports = (on, config) => {
   config.env.erpDB = process.env.ERP_DB
   config.env.erpPort = +process.env.ERP_PORT
   config.env.erpPartnerId = +process.env.PARTNER_ID
+  config.env.erpPartnerName = process.env.PARTNER_NAME
   return config
 }

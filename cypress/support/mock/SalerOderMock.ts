@@ -1,15 +1,18 @@
 import { BaseConfig, BaseMock } from './BaseMock'
 import { ProductMock } from './ProductMock';
+import { OdooRPC } from "../utils";
+import { PartnerMock } from "./PartnerMock";
 
 
 export class SaleOrderConfig extends BaseConfig<SaleOrderDepends> {
-  price?: number
-  qty?: number
-  state?: 'Received' | 'Confirmed' | 'Cancelled' | 'Progressing' | 'Delivering' | 'Delivered'
+  price: number
+  qty: number
+  state: 'Received' | 'Confirmed' | 'Cancelled' | 'Progressing' | 'Delivering' | 'Delivered'
 }
 
 export type SaleOrderDepends = {
   product?: ProductMock
+  partner?: PartnerMock
 }
 
 export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
@@ -19,16 +22,16 @@ export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
   protected async getDependency({depends, price = 100000}: Partial<SaleOrderConfig>): Promise<SaleOrderDepends> {
     const {product} = depends
     if (!product) {
-      depends.product = new ProductMock({price})
+      depends.product = new ProductMock({price, mainKhdQty: 10})
     }
     return depends
   }
 
-  protected async getCreateParam({qty = 1}: SaleOrderConfig, {product}: SaleOrderDepends): Promise<object> {
+  protected async getCreateParam({qty = 1}: SaleOrderConfig, {product, partner}: SaleOrderDepends): Promise<object> {
     const productData = await product.get(['product_variant_id', 'display_name', 'uom_id'])
     return {
       "picking_policy": "direct",
-      "partner_id": Cypress.env('erpPartnerId'),
+      "partner_id": partner?.getId() || OdooRPC.getPartnerId(),
       "order_line": [[0, 0, {
         "product_uom_qty": qty,
         "product_id": productData['product_variant_id'][0],
@@ -82,7 +85,7 @@ export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
 
     const pickings = await this.rpc.search('stock.picking', findPickPackDomain, ['id', 'picking_code'], 0)
     for (const code of pickCodes) {
-      await this.validatePicking(pickings.find(pick => pick.picking_code == code))
+      await this.validatePicking(pickings.find(pick => pick.picking_code == code)['id'])
     }
   }
 

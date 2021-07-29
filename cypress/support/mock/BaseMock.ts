@@ -20,6 +20,12 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
     this.setConfig(config)
   }
 
+  private async generateDependency() {
+    for (const depends of Object.keys(this.dependencies)) {
+      await this.dependencies[depends]?.generate()
+    }
+  }
+
   protected abstract getCreateParam(config: Partial<Config>, depends: Partial<Depend>): Promise<object>
 
   setConfig(config: Partial<Config>) {
@@ -34,12 +40,6 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
   }
 
   protected abstract getDependency(config: Partial<Config>): Promise<Depend>
-
-  private async generateDependency() {
-    for (const depends of Object.keys(this.dependencies)) {
-      await this.dependencies[depends].generate()
-    }
-  }
 
   /**
    * @name generate
@@ -101,16 +101,6 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
 
   getConfig(): Partial<Config> {
     return this.config
-  }
-
-  static with_cy(asyncCallback: () => Promise<any>) {
-    return cy.wrap("Mock").then({timeout: 30000}, () => {
-      return new Cypress.Promise(resolve => {
-        asyncCallback().then((result) => {
-          resolve(result)
-        })
-      })
-    })
   }
 
   protected async beforeCleanup(config: Partial<Config>, depends: Partial<Depend>): Promise<void> {

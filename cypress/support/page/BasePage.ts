@@ -76,7 +76,7 @@ export abstract class BasePage {
   }
 
   _selectMany2one(name: string, value: string) {
-    cy.get(`div[name="${name}"]`).as(`many2one_${name}`).click().type(value)
+    cy.get(`div[name="${name}"]`).as(`many2one_${name}`).click().clear().type(value)
     cy.wait(2000)
     cy.get(`@many2one_${name}`).type('{enter}')
   }
