@@ -1,11 +1,11 @@
-import { BaseConfig, BaseMock }  from './BaseMock'
+import { BaseConfig, BaseMock } from './BaseMock'
 import { ProductMock } from './ProductMock';
 
 
 export class SaleOrderConfig extends BaseConfig<SaleOrderDepends> {
   price?: number
   qty?: number
-  state?: 'Received' | 'Confirmed' | 'Cancelled' | 'Progressing'
+  state?: 'Received' | 'Confirmed' | 'Cancelled' | 'Progressing' | 'Delivering' | 'Delivered'
 }
 
 export type SaleOrderDepends = {
@@ -16,15 +16,15 @@ export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
   MODEL = 'sale.order'
   CAN_DELETE = true
 
-  protected async getDependency({ depends , price = 100000}: Partial<SaleOrderConfig>): Promise<SaleOrderDepends> {
-    const { product } = depends
+  protected async getDependency({depends, price = 100000}: Partial<SaleOrderConfig>): Promise<SaleOrderDepends> {
+    const {product} = depends
     if (!product) {
-      depends.product = new ProductMock({ price })
+      depends.product = new ProductMock({price})
     }
     return depends
   }
 
-  protected async getCreateParam({ qty = 1 }: SaleOrderConfig, { product }: SaleOrderDepends): Promise<object> {
+  protected async getCreateParam({qty = 1}: SaleOrderConfig, {product}: SaleOrderDepends): Promise<object> {
     const productData = await product.get(['product_variant_id', 'display_name', 'uom_id'])
     return {
       "picking_policy": "direct",
@@ -53,18 +53,53 @@ export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
       case 'Progressing':
         await this.processShip()
         break
+      case 'Delivering':
+        await this.processOut()
+        break
+      case 'Delivered':
+        await this.processDelivery()
     }
   }
 
-  async processShip(): Promise<void>{
+  async processShip(): Promise<void> {
     await this.confirm()
+
     const findShipPickingDomain = [
-      ['sale_id','=',this.getId()],
-      ['picking_code','=','SHIP']
+      ['sale_id', '=', this.getId()],
+      ['picking_code', '=', 'SHIP']
     ]
     const [shipPicking] = await this.rpc.search('stock.picking', findShipPickingDomain, ['id'])
-    const immediateTransferId = await this.rpc.create('stock.immediate.transfer', {pick_ids: [[4, shipPicking.id]]})
-    await this.rpc.call('stock.immediate.transfer','process',[immediateTransferId])
+    await this.validatePicking(shipPicking.id)
+  }
+
+  async processOut(): Promise<void> {
+    await this.processShip()
+    const pickCodes = ['PICK', 'PACK', 'OUT']
+    const findPickPackDomain = [
+      ['sale_id', '=', this.getId()],
+      ['picking_code', 'in', pickCodes]
+    ]
+
+    const pickings = await this.rpc.search('stock.picking', findPickPackDomain, ['id', 'picking_code'], 0)
+    for (const code of pickCodes) {
+      await this.validatePicking(pickings.find(pick => pick.picking_code == code))
+    }
+  }
+
+  async processDelivery(): Promise<void> {
+    await this.processOut()
+
+    const findDeliveryPickingDomain = [
+      ['sale_id', '=', this.getId()],
+      ['picking_code', '=', 'DE']
+    ]
+    const [deliveryPicking] = await this.rpc.search('stock.picking', findDeliveryPickingDomain, ['id'])
+    await this.validatePicking(deliveryPicking.id)
+  }
+
+  async validatePicking(id: number) {
+    const immediateTransferId = await this.rpc.create('stock.immediate.transfer', {pick_ids: [[4, id]]})
+    await this.rpc.call('stock.immediate.transfer', 'process', [immediateTransferId])
   }
 
   async confirm(): Promise<void> {
@@ -83,7 +118,7 @@ export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
   protected async beforeCleanup(config: Partial<SaleOrderConfig>): Promise<void> {
     await this.cancel()
     if (config.state == "Confirmed") {
-      const { picking_ids } = await this.get(['picking_ids'])
+      const {picking_ids} = await this.get(['picking_ids'])
       await this.rpc.unlink('stock.picking', picking_ids)
     }
   }
