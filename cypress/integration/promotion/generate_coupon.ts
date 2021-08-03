@@ -2,10 +2,14 @@ import { CouponProgramMock, SaleOrderMock } from '../../support/mock';
 import { CouponProgramPage, SaleOrderPage } from '../../support/page';
 import { cy_wrap, randomString } from "../../support/utils";
 
+const CONST = {
+  price: 10000
+}
 
 const programName = randomString()
 const couponProgramMock = new CouponProgramMock({ name: programName })
-const saleOrderMock = new SaleOrderMock()
+const saleOrderMock = new SaleOrderMock({ price: CONST.price })
+
 const page = new CouponProgramPage()
 const salePage = new SaleOrderPage()
 
@@ -66,7 +70,7 @@ describe('Generate coupon with length and prefix', function () {
       salePage._clickButton('Apply')
       cy.wait(5000)
       cy.contains(`Discount: ${programName}`).should('exist')
-      cy.contains('-1000').should('exist')
+      cy.contains(-CONST.price * 0.1).should('exist')
     })
   });
 

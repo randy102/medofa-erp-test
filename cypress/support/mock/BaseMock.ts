@@ -1,8 +1,9 @@
-import {OdooRPC} from '../utils'
-import {MockItem} from './MockItem';
+import { OdooRPC } from '../utils'
+import { MockItem } from './MockItem';
 
 export abstract class BaseConfig<Depend> {
   depends: Partial<Depend>
+  val?: object
 }
 
 export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implements MockItem<Config> {
@@ -30,7 +31,8 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
 
   setConfig(config: Partial<Config>) {
     this.config = config || {}
-    this.config['depends'] = this.config['depends'] || {}
+    this.config.depends ||= {}
+    this.config.val ||= {}
   }
 
   protected async beforeGenerated(config: Partial<Config>, depends: Partial<Depend>) {
@@ -65,8 +67,9 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
 
     const config = await this.getCreateParam(this.config, this.dependencies)
 
-    const created = await this.rpc.create(this.MODEL, config)
-    cy.log(`${this.constructor.name} Generated`)
+
+    const created = await this.rpc.create(this.MODEL, { ...config, ...this.config.val })
+    cy.log(`${this.constructor.name}(${created}) Generated`)
 
     this.id = created
     await this.afterGenerated(created, this.config, this.dependencies)
@@ -75,22 +78,19 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
 
 
   async get(fields: string[]): Promise<any> {
-    if (!this.id) {
-      throw Error('Mock Item is not generated yet!')
-    }
+    if (!this.id) throw Error('Mock Item is not generated yet!')
+
     let result = {}
     const fieldsToFetch = []
+
     for (const field of fields) {
       const KEY = 'field_' + field
-      if (this.existCache(KEY)) {
-        result[field] = this.getCache(KEY)
-      } else {
-        fieldsToFetch.push(field)
-      }
+      if (this.existCache(KEY)) result[field] = this.getCache(KEY)
+      else fieldsToFetch.push(field)
     }
     if (fieldsToFetch.length > 0) {
       const [fetchResult] = await this.rpc.read(this.MODEL, this.id, fieldsToFetch)
-      result = {...result, ...fetchResult}
+      result = { ...result, ...fetchResult }
     }
     return result
   }
@@ -113,6 +113,10 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
     return true
   }
 
+  /**
+   * Clean up method
+   * @param cleanupDependencies decide whether to cleanup its dependency after cleanup mock
+   */
   async cleanup(cleanupDependencies = true) {
     if (!this.id || !(await this.shouldCleanup(this.config, this.dependencies))) return
 

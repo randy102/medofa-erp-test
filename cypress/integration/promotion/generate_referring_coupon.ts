@@ -6,10 +6,10 @@ import { CouponProgramPage } from "../../support/page";
 
 const PROGRAM_NAME = randomString()
 
-const programMock = new CouponProgramMock({name: PROGRAM_NAME})
-const partnerMock = new PartnerMock({customerRefId: OdooRPC.getPartnerId()})
-const saleMock1 = new SaleOrderMock({depends: {partner: partnerMock}, state: 'Delivered'})
-const saleMock2 = new SaleOrderMock({depends: {partner: partnerMock}, state: 'Delivered'})
+const programMock = new CouponProgramMock({ name: PROGRAM_NAME })
+const partnerMock = new PartnerMock({ customerRefId: OdooRPC.getPartnerId() })
+const saleMock1 = new SaleOrderMock({ depends: { partner: partnerMock }, state: 'Delivered', stockQty: 1 })
+const saleMock2 = new SaleOrderMock({ depends: { partner: partnerMock }, state: 'Delivered', stockQty: 1 })
 
 const settingPage = new SettingPage()
 const programPage = new CouponProgramPage()

@@ -4,6 +4,7 @@ import { cy_wrap, OdooRPC, randomString } from "../../support/utils";
 
 
 const productMock = new ProductMock()
+
 const page = new SaleOrderPage()
 
 describe('Create Sale Order', function () {

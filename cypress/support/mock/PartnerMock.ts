@@ -1,7 +1,10 @@
 import { BaseConfig, BaseMock } from "./BaseMock";
 import { randomString } from "../utils";
+import { DistrictMock } from "./DistrictMock";
 
-type PartnerDepend = {}
+type PartnerDepend = {
+  district?: DistrictMock
+}
 
 class PartnerConfig extends BaseConfig<PartnerDepend> {
   name: string
@@ -10,19 +13,24 @@ class PartnerConfig extends BaseConfig<PartnerDepend> {
 
 export class PartnerMock extends BaseMock<PartnerConfig, PartnerDepend> {
   MODEL = 'res.partner'
+  CAN_DELETE = true
 
-  protected async getCreateParam({
-                                   name = randomString(),
-                                   customerRefId
-                                 }: Partial<PartnerConfig>, depends: Partial<PartnerDepend>): Promise<object> {
+  protected async getCreateParam(config: Partial<PartnerConfig>, depends: Partial<PartnerDepend>): Promise<object> {
+    const { name = randomString(), customerRefId } = config
+    const { district } = depends
     return {
       name,
-      customer_ref_id: customerRefId
+      customer_ref_id: customerRefId,
+      district_id: district.getId()
     }
   }
 
-  protected async getDependency(config: Partial<PartnerConfig>): Promise<PartnerDepend> {
-    return {}
+  protected async getDependency({ depends }: Partial<PartnerConfig>): Promise<PartnerDepend> {
+    const { district } = depends
+    if (!district) {
+      depends.district = new DistrictMock()
+    }
+    return depends
   }
 
 

@@ -3,7 +3,7 @@ import { MockItem } from '../mock';
 export abstract class MockFactory<Config> {
   protected mockList: MockItem<Config>[] = []
 
-  constructor(configs: Config[]) {
+  constructor(configs: Partial<Config>[]) {
     const Mock = this.getMockClass()
     for (const config of configs) {
       this.mockList.push(new Mock(config))

@@ -7,6 +7,7 @@ import { PartnerMock } from "./PartnerMock";
 export class SaleOrderConfig extends BaseConfig<SaleOrderDepends> {
   price: number
   qty: number
+  stockQty: number
   state: 'Received' | 'Confirmed' | 'Cancelled' | 'Progressing' | 'Delivering' | 'Delivered'
 }
 
@@ -19,10 +20,14 @@ export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
   MODEL = 'sale.order'
   CAN_DELETE = true
 
-  protected async getDependency({depends, price = 100000}: Partial<SaleOrderConfig>): Promise<SaleOrderDepends> {
-    const {product} = depends
+  protected async getDependency({
+                                  depends,
+                                  price = 100000,
+                                  stockQty = 0
+                                }: Partial<SaleOrderConfig>): Promise<SaleOrderDepends> {
+    const { product } = depends
     if (!product) {
-      depends.product = new ProductMock({price, mainKhdQty: 10})
+      depends.product = new ProductMock({ price, mainKhdQty: stockQty })
     }
     return depends
   }
