@@ -1,10 +1,7 @@
-import { OdooRPC } from '../utils'
+import { OdooRPC } from '../../utils'
 import { MockItem } from './MockItem';
+import { BaseConfig } from "./BaseConfig";
 
-export abstract class BaseConfig<Depend> {
-  depends: Partial<Depend>
-  val?: object
-}
 
 export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implements MockItem<Config> {
   protected rpc: OdooRPC
@@ -16,9 +13,15 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
   private config: Partial<Config>
   protected dependencies: Partial<Depend>
 
-  constructor(config?: Partial<Config>) {
+  constructor(config?: Partial<Config>, ConfigClass?) {
     this.rpc = OdooRPC.getInstance()
-    this.setConfig(config)
+    this.setConfig(config, ConfigClass)
+  }
+
+  setConfig(config: Partial<Config>, ConfigClass) {
+    this.config = new ConfigClass(config)
+    this.config.depends ||= {}
+    this.config.val ||= {}
   }
 
   private async generateDependency() {
@@ -27,16 +30,10 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
     }
   }
 
-  protected abstract getCreateParam(config: Partial<Config>, depends: Partial<Depend>): Promise<object>
-
-  setConfig(config: Partial<Config>) {
-    this.config = config || {}
-    this.config.depends ||= {}
-    this.config.val ||= {}
-  }
-
   protected async beforeGenerated(config: Partial<Config>, depends: Partial<Depend>) {
   }
+
+  protected abstract getCreateParam(config: Partial<Config>, depends: Partial<Depend>): Promise<object>
 
   protected async afterGenerated(id: number, config: Partial<Config>, depends: Partial<Depend>) {
   }
@@ -59,6 +56,9 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
    */
   async generate(): Promise<number> {
     if (this.id) return this.id
+    console.log(this.config)
+
+    return
 
     this.dependencies = await this.getDependency(this.config)
     await this.beforeGenerated(this.config, this.dependencies)

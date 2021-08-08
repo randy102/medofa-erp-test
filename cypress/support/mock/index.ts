@@ -1,5 +1,5 @@
-export * from './MockItem'
-export * from './BaseMock'
+export * from '../lib/mock/MockItem'
+export * from '../lib/mock/BaseMock'
 
 export * from './ProductMock'
 export * from './CouponProgramMock'

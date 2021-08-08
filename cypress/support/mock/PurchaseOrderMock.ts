@@ -1,4 +1,4 @@
-import { BaseConfig, BaseMock } from './BaseMock';
+import { BaseConfig, BaseMock } from '../lib';
 import { ProductMock } from './ProductMock';
 import moment = require('moment');
 

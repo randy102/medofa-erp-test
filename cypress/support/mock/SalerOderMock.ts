@@ -1,18 +1,34 @@
-import { BaseConfig, BaseMock } from './BaseMock'
+import { BaseConfig, BaseMock, One2ManyConfig } from '../lib'
 import { ProductMock } from './ProductMock';
 import { OdooRPC } from "../utils";
 import { PartnerMock } from "./PartnerMock";
+import { Many2One, One2Many } from "../lib";
 
+export class SaleOrderLineConfig extends One2ManyConfig {
+  price?: number
+  qty?: number
+  stockQty?: number
+
+  @Many2One
+  product?: ProductMock
+}
 
 export class SaleOrderConfig extends BaseConfig<SaleOrderDepends> {
+  @One2Many(SaleOrderLineConfig)
+  orderLines: SaleOrderLineConfig[]
+
+  partner: PartnerMock
   price: number
+  price1: number
   qty: number
+  qty1: number
   stockQty: number
   state: 'Received' | 'Confirmed' | 'Cancelled' | 'Progressing' | 'Delivering' | 'Delivered'
 }
 
 export type SaleOrderDepends = {
   product?: ProductMock
+  product1?: ProductMock
   partner?: PartnerMock
 }
 
@@ -20,11 +36,12 @@ export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
   MODEL = 'sale.order'
   CAN_DELETE = true
 
-  protected async getDependency({
-                                  depends,
-                                  price = 100000,
-                                  stockQty = 0
-                                }: Partial<SaleOrderConfig>): Promise<SaleOrderDepends> {
+  constructor(config?) {
+    super(config, SaleOrderConfig);
+  }
+
+  protected async getDependency(config: Partial<SaleOrderConfig>): Promise<SaleOrderDepends> {
+    const { price = 100000, stockQty = 0, depends } = config
     const { product } = depends
     if (!product) {
       depends.product = new ProductMock({ price, mainKhdQty: stockQty })
@@ -32,8 +49,11 @@ export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
     return depends
   }
 
-  protected async getCreateParam({qty = 1}: SaleOrderConfig, {product, partner}: SaleOrderDepends): Promise<object> {
+  protected async getCreateParam(config: SaleOrderConfig, { product, partner }: SaleOrderDepends): Promise<object> {
+    const { qty = 1, qty1 } = config
+
     const productData = await product.get(['product_variant_id', 'display_name', 'uom_id'])
+
     return {
       "picking_policy": "direct",
       "partner_id": partner?.getId() || OdooRPC.getPartnerId(),

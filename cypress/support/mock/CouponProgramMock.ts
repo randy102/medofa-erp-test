@@ -1,5 +1,5 @@
-import {randomString} from '../utils';
-import {BaseConfig, BaseMock} from './BaseMock';
+import { randomString } from '../utils';
+import { BaseConfig, BaseMock } from '../lib';
 
 export class CouponProgramConfig extends BaseConfig<CouponProgramDepend> {
     name?: string

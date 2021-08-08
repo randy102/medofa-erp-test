@@ -1,5 +1,5 @@
-import {BaseConfig, BaseMock} from './BaseMock'
-import {CK, GlobalCache} from "../cache";
+import { BaseConfig, BaseMock } from '../lib'
+import { CK, GlobalCache } from "../cache";
 import {randomString} from "../utils";
 
 export class ProductConfig extends BaseConfig<ProductDepend> {
@@ -16,6 +16,8 @@ export type ProductDepend = {}
 export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
   MODEL = 'product.template'
   CAN_DELETE = true
+
+  private initQty = false
 
   protected async getDependency(config: Partial<ProductConfig>): Promise<ProductDepend> {
     return {};
@@ -67,12 +69,17 @@ export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
     if (typeof lot == 'number') {
       val['lot_id'] = lot
     } else {
-      val['lot_id'] = await this.rpc.call('stock.production.lot','create', {
+      val['lot_id'] = await this.rpc.call('stock.production.lot', 'create', {
         name: lot,
         product_id: productId,
         company_id: companyId
       })
     }
-    await this.rpc.with_context({'inventory_mode': true}).call('stock.quant','create', val)
+    await this.rpc.with_context({ 'inventory_mode': true }).call('stock.quant', 'create', val)
+    this.initQty = true
+  }
+
+  protected async shouldCleanup(config: Partial<ProductConfig>, depends: Partial<ProductDepend>): Promise<boolean> {
+    return !this.initQty
   }
 }
