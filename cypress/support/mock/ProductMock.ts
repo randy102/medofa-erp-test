@@ -1,8 +1,8 @@
-import { BaseConfig, BaseMock } from '../lib'
+import { BaseConfig, BaseMock, BaseMockConfig, RawConfig } from '../lib'
 import { CK, GlobalCache } from "../cache";
 import {randomString} from "../utils";
 
-export class ProductConfig extends BaseConfig<ProductDepend> {
+export class ProductConfig extends BaseConfig {
   name?: string
   price?: number
   mainHdQty?: number
@@ -14,13 +14,19 @@ export class ProductConfig extends BaseConfig<ProductDepend> {
 export type ProductDepend = {}
 
 export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
-  MODEL = 'product.template'
-  CAN_DELETE = true
-
   private initQty = false
 
-  protected async getDependency(config: Partial<ProductConfig>): Promise<ProductDepend> {
-    return {};
+  protected async getDependency(config: RawConfig<ProductConfig, ProductDepend>): Promise<[ProductDepend, object]> {
+    return [undefined, undefined];
+  }
+
+
+  protected getMockConfig(): BaseMockConfig {
+    return {
+      configClass: ProductConfig,
+      model: 'product.template',
+      canDelete: true
+    };
   }
 
   protected async getCreateParam({ price, name }: ProductConfig): Promise<object> {
@@ -30,7 +36,12 @@ export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
     }
   }
 
-  protected async afterGenerated(id: number, { mainHdQty, mainKhdQty, inboundQty, scrapQty }: Partial<ProductConfig>): Promise<void> {
+  protected async afterGenerated(id: number, {
+    mainHdQty,
+    mainKhdQty,
+    inboundQty,
+    scrapQty
+  }: Partial<ProductConfig>): Promise<void> {
     if (!isNaN(mainHdQty) && mainHdQty > 0) {
       const mainHDLocationId = await GlobalCache.get(CK.MAIN_STOCK_HD_LOCATION_ID)
       await this.generateLotQuantity(mainHDLocationId, randomString(), mainHdQty)
@@ -82,4 +93,6 @@ export class ProductMock extends BaseMock<ProductConfig, ProductDepend> {
   protected async shouldCleanup(config: Partial<ProductConfig>, depends: Partial<ProductDepend>): Promise<boolean> {
     return !this.initQty
   }
+
+
 }

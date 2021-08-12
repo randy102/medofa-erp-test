@@ -6,7 +6,7 @@ type PartnerDepend = {
   district?: DistrictMock
 }
 
-class PartnerConfig extends BaseConfig<PartnerDepend> {
+export class PartnerConfig extends BaseConfig {
   name: string
   customerRefId: number
 }

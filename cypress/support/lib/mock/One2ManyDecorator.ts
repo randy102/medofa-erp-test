@@ -1,11 +1,11 @@
 import { BaseConfig } from "./BaseConfig";
 
 
-export function One2Many(FieldClass) {
-  return function (target: BaseConfig<any>, propertyKey: string) {
-    if (!target['one2manyFields']) {
-      target['one2manyFields'] = {}
+export function One2Many(MockClass) {
+  return function (target: BaseConfig, propertyKey: string) {
+    if (!target['refFields']) {
+      target['refFields'] = {}
     }
-    target['one2manyFields'][propertyKey] = FieldClass
+    target['refFields'][propertyKey] = [MockClass, '']
   }
 }

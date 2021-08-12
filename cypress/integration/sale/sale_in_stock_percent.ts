@@ -1,11 +1,17 @@
-import { SaleOrderMock } from "../../support/mock";
+import { PartnerMock, SaleOrderMock } from "../../support/mock";
 import { cy_wrap } from "../../support/utils";
 import { SaleOrderPage } from "../../support/page";
 import { SaleOrderFactory } from "../../support/mock_factory";
 
-const saleMock1 = new SaleOrderMock({ state: 'Cancelled' })
-const saleMock2 = new SaleOrderMock({ state: 'Confirmed', stockQty: 1 })
-const saleMock3 = new SaleOrderMock({ orderLines: [{ qty: 1, price: 43 }] })
+// const saleMock1 = new SaleOrderMock({ state: 'Cancelled' })
+// const saleMock2 = new SaleOrderMock({ state: 'Confirmed', stockQty: 1 })
+const partner = new PartnerMock()
+const saleMock3 = new SaleOrderMock({
+  config: {
+    orderLines: [{ qty: 1, price: 43 }],
+    partner: partner
+  },
+})
 
 
 const page = new SaleOrderPage()

@@ -3,7 +3,7 @@ import { DistrictMock } from "../../support/mock/DistrictMock";
 import { cy_wrap } from "../../support/utils";
 import { SaleOrderPage } from "../../support/page";
 
-const districtMock = new DistrictMock({ val: { warning_covid: true } })
+const districtMock = new DistrictMock({ raw: { warning_covid: true } })
 const partnerMock = new PartnerMock({ depends: { district: districtMock } })
 const saleMock1 = new SaleOrderMock({ depends: { partner: partnerMock } })
 

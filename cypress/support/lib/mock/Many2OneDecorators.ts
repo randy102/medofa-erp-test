@@ -1,7 +1,8 @@
-export function Many2One(target: any, propertyKey: string) {
-  console.log(target)
-  if (!target['dependFields']) {
-    target['dependFields'] = []
+export function Many2One(MockClass, fieldId) {
+  return function (target, propertyKey: string) {
+    if (!target['refFields']) {
+      target['refFields'] = {}
+    }
+    target['refFields'][propertyKey] = [MockClass]
   }
-  target['dependFields'].push(propertyKey)
 }

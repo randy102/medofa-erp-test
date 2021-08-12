@@ -1,7 +1,16 @@
-import { BaseConfig, BaseMock, One2ManyConfig } from '../lib'
+import {
+  BaseConfig,
+  BaseMock,
+  BaseMockConfig,
+  M2ORecord, MockInitiator,
+  O2MRecord,
+  One2ManyConfig,
+  RawConfig,
+  RefFieldInitiator
+} from '../lib'
 import { ProductMock } from './ProductMock';
 import { OdooRPC } from "../utils";
-import { PartnerMock } from "./PartnerMock";
+import { PartnerConfig, PartnerMock } from "./PartnerMock";
 import { Many2One, One2Many } from "../lib";
 
 export class SaleOrderLineConfig extends One2ManyConfig {
@@ -9,15 +18,17 @@ export class SaleOrderLineConfig extends One2ManyConfig {
   qty?: number
   stockQty?: number
 
-  @Many2One
-  product?: ProductMock
+  @Many2One(ProductMock, 'order_line_product')
+  product?: M2ORecord<ProductMock>
 }
 
-export class SaleOrderConfig extends BaseConfig<SaleOrderDepends> {
+export class SaleOrderConfig extends BaseConfig {
   @One2Many(SaleOrderLineConfig)
-  orderLines: SaleOrderLineConfig[]
+  orderLines: O2MRecord<SaleOrderLineConfig>
 
-  partner: PartnerMock
+  @Many2One(PartnerMock, 'partner')
+  partner: M2ORecord<PartnerMock>
+
   price: number
   price1: number
   qty: number
@@ -33,30 +44,42 @@ export type SaleOrderDepends = {
 }
 
 export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
-  MODEL = 'sale.order'
-  CAN_DELETE = true
 
-  constructor(config?) {
-    super(config, SaleOrderConfig);
+  protected getMockConfig(): BaseMockConfig {
+    return {
+      configClass: SaleOrderConfig,
+      model: 'sale.order',
+      canDelete: true
+    };
   }
 
-  protected async getDependency(config: Partial<SaleOrderConfig>): Promise<SaleOrderDepends> {
-    const { price = 100000, stockQty = 0, depends } = config
-    const { product } = depends
+  protected async getDependency({
+                                  config,
+                                  depend
+                                }: RawConfig<SaleOrderConfig, SaleOrderDepends>): Promise<SaleOrderDepends> {
+    const { price = 100000, stockQty = 0 } = config
+    const { product } = depend
     if (!product) {
-      depends.product = new ProductMock({ price, mainKhdQty: stockQty })
+      depend.product = new ProductMock({ config: { price, mainKhdQty: stockQty } })
     }
-    return depends
+    return depend
   }
 
-  protected async getCreateParam(config: SaleOrderConfig, { product, partner }: SaleOrderDepends): Promise<object> {
-    const { qty = 1, qty1 } = config
+  protected async getInitiator(config: RawConfig<SaleOrderConfig, SaleOrderDepends>): Promise<RefFieldInitiator> {
+    return {
+      'partner': new MockInitiator<PartnerConfig>(PartnerMock),
+      'order_line_product': new MockInitiator(ProductMock)
+    }
+  }
+
+  protected async getCreateParam(config: SaleOrderConfig, { product }: SaleOrderDepends): Promise<object> {
+    const { qty = 1, qty1, partner } = config
 
     const productData = await product.get(['product_variant_id', 'display_name', 'uom_id'])
 
     return {
       "picking_policy": "direct",
-      "partner_id": partner?.getId() || OdooRPC.getPartnerId(),
+      "partner_id": (partner as PartnerMock)?.getId() || OdooRPC.getPartnerId(),
       "order_line": [[0, 0, {
         "product_uom_qty": qty,
         "product_id": productData['product_variant_id'][0],
@@ -67,7 +90,7 @@ export class SaleOrderMock extends BaseMock<SaleOrderConfig, SaleOrderDepends> {
     }
   }
 
-  protected async afterGenerated(id: number, config: Partial<SaleOrderConfig>): Promise<void> {
+  protected async afterGenerated(id: number, { config }: RawConfig<SaleOrderConfig, SaleOrderDepends>, depends: SaleOrderDepends): Promise<void> {
     switch (config.state) {
       case 'Received':
         await this.receive()

@@ -2,27 +2,62 @@ import { OdooRPC } from '../../utils'
 import { MockItem } from './MockItem';
 import { BaseConfig } from "./BaseConfig";
 
+export type RawConfig<C, D> = {
+  config?: Partial<C>,
+  depend?: Partial<D>
+}
 
-export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implements MockItem<Config> {
+export type BaseMockConfig = {
+  configClass: any,
+  model: string
+  canDelete?: boolean
+}
+
+export type RefFieldInitiator = { [field: string]: MockInitiator }
+
+export class MockInitiator<Config = any> {
+  private readonly config: Config
+  private readonly MockClass
+
+  constructor(mockClass, config?: Config) {
+    this.MockClass = mockClass
+    this.config = config
+  }
+
+  init() {
+    return new this.MockClass(this.config)
+  }
+
+}
+
+export abstract class BaseMock<Config extends BaseConfig, Depend> implements MockItem<Config> {
   protected rpc: OdooRPC
-  protected MODEL: string
-  protected CAN_DELETE: boolean = false
+  protected readonly MODEL: string
+  private readonly CAN_DELETE: boolean
 
   private CACHE: { [key: string]: any } = {}
   private id: number
-  private config: Partial<Config>
-  protected dependencies: Partial<Depend>
 
-  constructor(config?: Partial<Config>, ConfigClass?) {
+  private readonly rawConfig: RawConfig<Config, Depend>
+  private readonly config: Config
+  protected dependencies: Depend
+  protected refFieldInitiator: RefFieldInitiator
+
+
+  constructor(config?: RawConfig<Config, Depend> | number) {
     this.rpc = OdooRPC.getInstance()
-    this.setConfig(config, ConfigClass)
+    if (typeof config == 'number')
+      this.id = config
+    else
+      this.rawConfig = config || { config: {}, depend: {} }
+
+    const { configClass, model, canDelete = false } = this.getMockConfig()
+    this.config = new configClass(this.rawConfig)
+    this.MODEL = model
+    this.CAN_DELETE = canDelete
   }
 
-  setConfig(config: Partial<Config>, ConfigClass) {
-    this.config = new ConfigClass(config)
-    this.config.depends ||= {}
-    this.config.val ||= {}
-  }
+  protected abstract getMockConfig(): BaseMockConfig
 
   private async generateDependency() {
     for (const depends of Object.keys(this.dependencies)) {
@@ -35,10 +70,16 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
 
   protected abstract getCreateParam(config: Partial<Config>, depends: Partial<Depend>): Promise<object>
 
-  protected async afterGenerated(id: number, config: Partial<Config>, depends: Partial<Depend>) {
+  protected async afterGenerated(id: number, config: RawConfig<Config, Depend>, depends: Depend) {
   }
 
-  protected abstract getDependency(config: Partial<Config>): Promise<Depend>
+  protected async getInitiator(config: RawConfig<Config, Depend>): Promise<RefFieldInitiator> {
+    return null
+  }
+
+  protected async getDependency(config: RawConfig<Config, Depend>): Promise<Depend> {
+    return null
+  }
 
   /**
    * @name generate
@@ -58,21 +99,23 @@ export abstract class BaseMock<Config extends BaseConfig<Depend>, Depend> implem
     if (this.id) return this.id
     console.log(this.config)
 
-    return
+    this.dependencies = await this.getDependency(this.rawConfig)
 
-    this.dependencies = await this.getDependency(this.config)
     await this.beforeGenerated(this.config, this.dependencies)
 
     await this.generateDependency()
 
+    this.refFieldInitiator = await this.getInitiator(this.rawConfig)
+
+    this.config.convertRefToMock(this.refFieldInitiator)
+
     const config = await this.getCreateParam(this.config, this.dependencies)
 
-
-    const created = await this.rpc.create(this.MODEL, { ...config, ...this.config.val })
+    const created = await this.rpc.create(this.MODEL, { ...config, ...this.config.raw })
     cy.log(`${this.constructor.name}(${created}) Generated`)
 
     this.id = created
-    await this.afterGenerated(created, this.config, this.dependencies)
+    await this.afterGenerated(created, this.rawConfig, this.dependencies)
     return created
   }
 
