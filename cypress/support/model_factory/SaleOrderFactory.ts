@@ -1,4 +1,4 @@
-import { ModelFactory } from '@lib';
+import { ModelFactory } from 'odoo-seeder';
 import { SaleOrderModel, SaleOrderOption } from '../model';
 
 

@@ -14,6 +14,7 @@
     "class-transformer": "^0.4.0",
     "dotenv": "^10.0.0",
     "moment": "^2.29.1",
+    "odoo-seeder": "^1.0.4",
     "odoo-xmlrpc": "^1.0.8"
   },
   "devDependencies": {

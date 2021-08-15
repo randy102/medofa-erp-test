@@ -1,4 +1,4 @@
-import { Field, SeedModel, ModelConfig, SeedOption, randomString } from '@lib';
+import { Field, SeedModel, ModelConfig, SeedOption, randomString } from 'odoo-seeder';
 import { CK, GlobalCache } from '../cache';
 
 export class ProductOption extends SeedOption {

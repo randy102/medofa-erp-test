@@ -3,7 +3,7 @@ import { cy_wrap } from "../../support/utils";
 import { ConfigParam } from "../../support/extension";
 import { CouponProgramPage } from "../../support/page";
 import { PartnerModel, SaleOrderModel, CouponProgramModel } from '../../support/model';
-import { OdooRPC, randomString } from '@lib';
+import { OdooRPC, randomString } from 'odoo-seeder';
 
 const PROGRAM_NAME = randomString()
 

@@ -1,4 +1,4 @@
-import { Field, SeedModel, ModelConfig, SeedOption } from '@lib';
+import { Field, SeedModel, ModelConfig, SeedOption } from 'odoo-seeder'
 
 export class CouponProgramOption extends SeedOption {
   @Field({ key: 'name' })

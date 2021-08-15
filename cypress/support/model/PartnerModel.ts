@@ -1,4 +1,4 @@
-import { Field, SeedModel, ModelConfig, ORecord, randomString, SeedOption } from '@lib';
+import { Field, SeedModel, ModelConfig, ORecord, randomString, SeedOption } from 'odoo-seeder';
 import { DistrictModel } from './DistrictModel';
 
 export class PartnerOption extends SeedOption {

@@ -1,4 +1,4 @@
-import { Field, SeedModel, ModelConfig, MRecord, ORecord, SeedOption, OdooRPC, formatDatetime } from '@lib';
+import { Field, SeedModel, ModelConfig, MRecord, ORecord, SeedOption, OdooRPC, formatDatetime } from 'odoo-seeder';
 import { ProductModel } from './ProductModel';
 import moment = require('moment');
 import { PartnerModel } from './PartnerModel';

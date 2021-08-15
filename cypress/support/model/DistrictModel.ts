@@ -1,4 +1,4 @@
-import { Field, SeedModel, ModelConfig, SeedOption, randomString } from '@lib';
+import { Field, SeedModel, ModelConfig, SeedOption, randomString } from 'odoo-seeder';
 
 export class DistrictOption extends SeedOption {
   @Field({ key: 'name', def: () => randomString() })

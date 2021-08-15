@@ -1,7 +1,7 @@
 import { CouponProgramPage, SaleOrderPage } from '../../support/page';
 import { cy_wrap } from "../../support/utils";
 import { SaleOrderModel, CouponProgramModel } from '../../support/model';
-import { randomString } from '@lib';
+import { randomString } from 'odoo-seeder';
 
 const CONST = {
   price: 10000

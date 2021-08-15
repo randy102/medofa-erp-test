@@ -1,4 +1,4 @@
-import { Field, SeedModel, ModelConfig, MRecord, ORecord, OdooRPC, SeedOption } from '@lib';
+import { Field, SeedModel, ModelConfig, MRecord, ORecord, OdooRPC, SeedOption } from 'odoo-seeder';
 import { ProductModel } from './ProductModel';
 import { PartnerModel } from './PartnerModel';
 
