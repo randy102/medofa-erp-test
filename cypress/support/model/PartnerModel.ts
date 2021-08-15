@@ -1,4 +1,4 @@
-import { Field, Model, ModelConfig, ORecord, randomString, SeedOption } from '../lib';
+import { Field, SeedModel, ModelConfig, ORecord, randomString, SeedOption } from '@lib';
 import { DistrictModel } from './DistrictModel';
 
 export class PartnerOption extends SeedOption {
@@ -12,7 +12,7 @@ export class PartnerOption extends SeedOption {
   district: ORecord<DistrictModel>
 }
 
-export class PartnerModel extends Model<PartnerOption> {
+export class PartnerModel extends SeedModel<PartnerOption> {
   protected getModelConfig(): ModelConfig {
     return { modelName: 'res.partner', optionClass: PartnerOption };
   }

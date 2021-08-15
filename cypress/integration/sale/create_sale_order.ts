@@ -1,7 +1,7 @@
 import { SaleOrderPage, SaleState } from '../../support/page';
 import { cy_wrap } from "../../support/utils";
 import { ProductModel } from '../../support/model';
-import { OdooRPC } from '../../support/lib';
+import { OdooRPC } from '@lib';
 
 
 const productMock = new ProductModel()

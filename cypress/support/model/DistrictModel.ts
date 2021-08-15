@@ -1,4 +1,4 @@
-import { Field, Model, ModelConfig, SeedOption, randomString } from '../lib';
+import { Field, SeedModel, ModelConfig, SeedOption, randomString } from '@lib';
 
 export class DistrictOption extends SeedOption {
   @Field({ key: 'name', def: () => randomString() })
@@ -8,7 +8,7 @@ export class DistrictOption extends SeedOption {
   covid: boolean
 }
 
-export class DistrictModel extends Model<DistrictOption> {
+export class DistrictModel extends SeedModel<DistrictOption> {
   protected getModelConfig(): ModelConfig {
     return {
       modelName: 'medofa.district',

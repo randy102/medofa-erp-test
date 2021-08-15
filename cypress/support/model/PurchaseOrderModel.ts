@@ -1,4 +1,4 @@
-import { Field, Model, ModelConfig, MRecord, ORecord, SeedOption, OdooRPC, formatDatetime } from '../lib';
+import { Field, SeedModel, ModelConfig, MRecord, ORecord, SeedOption, OdooRPC, formatDatetime } from '@lib';
 import { ProductModel } from './ProductModel';
 import moment = require('moment');
 import { PartnerModel } from './PartnerModel';
@@ -34,7 +34,7 @@ export class PurchaseOrderOption extends SeedOption {
   state: 'Approved' | 'Confirmed' | 'Cancelled'
 }
 
-export class PurchaseOrderModel extends Model<PurchaseOrderOption> {
+export class PurchaseOrderModel extends SeedModel<PurchaseOrderOption> {
   protected getModelConfig(): ModelConfig {
     return {
       modelName: 'purchase.order',

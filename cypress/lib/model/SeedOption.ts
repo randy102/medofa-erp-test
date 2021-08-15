@@ -1,4 +1,4 @@
-import { Model } from './Model';
+import { SeedModel } from './SeedModel';
 import { FieldMetadata } from './FieldMetadata';
 import { FieldDefault } from './FieldDecorator';
 import { clone } from '../helper';
@@ -49,7 +49,7 @@ export class SeedOption {
     for (const field of this.fieldMetadata) {
       const { fieldName } = field
       if (field.isM2O()) {
-        await (this[fieldName] as Model<any>).generate()
+        await (this[fieldName] as SeedModel<any>).generate()
       } else if (field.isO2M(this)) {
         for (const opt of this[fieldName]) {
           await (opt as SeedOption).generateORecord()
@@ -63,7 +63,7 @@ export class SeedOption {
     for (const field of this.fieldMetadata) {
       const { fieldName } = field
       if (field.isM2O()) {
-        await (this[fieldName] as Model<any>).cleanup()
+        await (this[fieldName] as SeedModel<any>).cleanup()
       } else if (field.isO2M(this)) {
         for (const opt of this[fieldName]) {
           await (opt as SeedOption).cleanupORecord()
@@ -82,7 +82,7 @@ export class SeedOption {
       } else if (field.isO2M(this)) {
         data[key] = SeedOption.formatO2MData(this[fieldName].map(f => f.getSeedData()))
       } else {
-        data[key] = (this[fieldName] as Model<any>).getId()
+        data[key] = (this[fieldName] as SeedModel<any>).getId()
       }
     }
     return data

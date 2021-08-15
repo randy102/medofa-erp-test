@@ -1,4 +1,4 @@
-import { Field, Model, ModelConfig, SeedOption, randomString } from '../lib';
+import { Field, SeedModel, ModelConfig, SeedOption, randomString } from '@lib';
 import { CK, GlobalCache } from '../cache';
 
 export class ProductOption extends SeedOption {
@@ -14,7 +14,7 @@ export class ProductOption extends SeedOption {
   scrapQty?: number
 }
 
-export class ProductModel extends Model<ProductOption> {
+export class ProductModel extends SeedModel<ProductOption> {
   private initQty = false
 
   protected getModelConfig(): ModelConfig {

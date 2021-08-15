@@ -9,7 +9,7 @@ export type ModelConfig = {
 }
 
 
-export abstract class Model<Option extends SeedOption> implements IModel {
+export abstract class SeedModel<Option extends SeedOption> implements IModel {
   protected readonly rpc: OdooRPC = OdooRPC.getInstance()
   protected MODEL: string
   protected ID: number
@@ -126,7 +126,7 @@ export abstract class Model<Option extends SeedOption> implements IModel {
   }
 
   ensureIdExisted() {
-    if (!this.getId()) throw Error('ID undefined. Model is not generated.')
+    if (!this.getId()) throw Error('ID undefined. SeedModel is not generated.')
   }
 
   getId(): number {

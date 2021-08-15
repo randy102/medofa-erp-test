@@ -1,4 +1,4 @@
-import { OdooRPC } from '../lib';
+import { OdooRPC } from '@lib';
 
 
 export class ConfigParam {

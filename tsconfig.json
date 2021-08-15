@@ -9,7 +9,13 @@
     ],
     "types": [
       "cypress"
-    ]
+    ],
+    "baseUrl": "./cypress",
+    "paths": {
+      "@lib": [
+        "lib"
+      ]
+    }
   },
   "include": ["**/*.ts"]
 }

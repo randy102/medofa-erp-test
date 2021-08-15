@@ -1,4 +1,4 @@
-import { Field, Model, ModelConfig, SeedOption } from '../lib';
+import { Field, SeedModel, ModelConfig, SeedOption } from '@lib';
 
 export class CouponProgramOption extends SeedOption {
   @Field({ key: 'name' })
@@ -8,7 +8,7 @@ export class CouponProgramOption extends SeedOption {
   type: string
 }
 
-export class CouponProgramModel extends Model<CouponProgramOption> {
+export class CouponProgramModel extends SeedModel<CouponProgramOption> {
   protected getModelConfig(): ModelConfig {
     return {
       modelName: 'sale.coupon.program',

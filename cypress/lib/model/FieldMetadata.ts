@@ -1,5 +1,5 @@
 import { FieldConfig, FieldDefault } from './FieldDecorator';
-import { Model } from './Model';
+import { SeedModel } from './SeedModel';
 
 
 export class FieldMetadata {
@@ -21,7 +21,7 @@ export class FieldMetadata {
   }
 
   isM2O(): boolean {
-    return this.FieldClass && this.FieldClass.prototype instanceof Model
+    return this.FieldClass && this.FieldClass.prototype instanceof SeedModel
   }
 
   isO2M(option): boolean {

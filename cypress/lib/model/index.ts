@@ -1,4 +1,4 @@
-export * from './Model'
+export * from './SeedModel'
 export * from './SeedOption'
 export * from './FieldDecorator'
 export * from './RecordTypes'

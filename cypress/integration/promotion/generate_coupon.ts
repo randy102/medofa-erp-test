@@ -1,7 +1,7 @@
 import { CouponProgramPage, SaleOrderPage } from '../../support/page';
 import { cy_wrap } from "../../support/utils";
 import { SaleOrderModel, CouponProgramModel } from '../../support/model';
-import { randomString } from '../../support/lib';
+import { randomString } from '@lib';
 
 const CONST = {
   price: 10000

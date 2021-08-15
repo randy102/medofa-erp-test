@@ -1,5 +1,4 @@
-import { Field, Model, ModelConfig, MRecord, ORecord, OdooRPC } from '../lib';
-import { SeedOption } from '../lib';
+import { Field, SeedModel, ModelConfig, MRecord, ORecord, OdooRPC, SeedOption } from '@lib';
 import { ProductModel } from './ProductModel';
 import { PartnerModel } from './PartnerModel';
 
@@ -27,7 +26,7 @@ export class SaleOrderOption extends SeedOption {
   state: 'Received' | 'Confirmed' | 'Cancelled' | 'Progressing' | 'Delivering' | 'Delivered'
 }
 
-export class SaleOrderModel extends Model<SaleOrderOption> {
+export class SaleOrderModel extends SeedModel<SaleOrderOption> {
   protected getModelConfig(): ModelConfig {
     return { modelName: 'sale.order', optionClass: SaleOrderOption };
   }

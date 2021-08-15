@@ -2,7 +2,7 @@ import { SaleOrderFactory } from '../../support/model_factory';
 import { OrderLinePage } from '../../support/page';
 import { cy_wrap } from "../../support/utils";
 import { ProductModel, PurchaseOrderModel } from '../../support/model';
-import { randomInt } from '../../support/lib';
+import { randomInt } from '@lib';
 
 const CONST = {
   mainKhdQty: randomInt(10, 30),
