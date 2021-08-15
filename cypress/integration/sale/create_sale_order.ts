@@ -1,9 +1,10 @@
-import { ProductMock } from '../../support/mock';
 import { SaleOrderPage, SaleState } from '../../support/page';
-import { cy_wrap, OdooRPC, randomString } from "../../support/utils";
+import { cy_wrap } from "../../support/utils";
+import { ProductModel } from '../../support/model';
+import { OdooRPC } from '../../support/lib';
 
 
-const productMock = new ProductMock()
+const productMock = new ProductModel()
 
 const page = new SaleOrderPage()
 
@@ -57,7 +58,7 @@ describe('Create Sale Order', function () {
   });
 
   it('should confirm order successfully when product has enough stock', function () {
-    cy_wrap(() => productMock.generateMainKhdQty(randomString(), 5))
+    cy_wrap(() => productMock.generateMainKhdQty(5))
     page._clickTreeItem(this.order_name)
 
     page._clickButton('Confirm', 'action_confirm_with_check_stock')
@@ -72,20 +73,20 @@ describe('Create Sale Order', function () {
   it('should cancel order', function () {
     page._clickTreeItem(this.order_name)
 
-    page._clickButton('Cancel','action_cancel_with_reason')
-    cy.contains('.modal-title','Please input order cancel reason!').should('be.visible')
-    page._clickButton('Confirm','action_confirm_cancel')
+    page._clickButton('Cancel', 'action_cancel_with_reason')
+    cy.contains('.modal-title', 'Please input order cancel reason!').should('be.visible')
+    page._clickButton('Confirm', 'action_confirm_cancel')
     page._findToast('Type').should('be.visible')
 
-    page._selectMany2one('type','Khách hàng ảo')
-    page._textArea('content','Test')
-    page._clickButton('Confirm','action_confirm_cancel')
+    page._selectMany2one('type', 'Khách hàng ảo')
+    page._textArea('content', 'Test')
+    page._clickButton('Confirm', 'action_confirm_cancel')
     page.getStateButton(SaleState.CANCELED).should('have.attr', 'aria-checked', 'true')
 
     page._clickTab('Cancel Info')
-    page._findFormField('cancel_type_id').should('contain','Khách hàng ảo')
-    page._findFormField('cancel_content').should('contain','Test')
-    page._findFormField('state_before_cancel').should('contain','Confirmed')
+    page._findFormField('cancel_type_id').should('contain', 'Khách hàng ảo')
+    page._findFormField('cancel_content').should('contain', 'Test')
+    page._findFormField('state_before_cancel').should('contain', 'Confirmed')
 
     page._navigateMainView()
     page._findTreeColumn(this.order_name, 'flag_db').should('contain', '25')

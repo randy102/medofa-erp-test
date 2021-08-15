@@ -1,14 +1,15 @@
-import { CouponProgramMock, SaleOrderMock } from '../../support/mock';
 import { CouponProgramPage, SaleOrderPage } from '../../support/page';
-import { cy_wrap, randomString } from "../../support/utils";
+import { cy_wrap } from "../../support/utils";
+import { SaleOrderModel, CouponProgramModel } from '../../support/model';
+import { randomString } from '../../support/lib';
 
 const CONST = {
   price: 10000
 }
 
 const programName = randomString()
-const couponProgramMock = new CouponProgramMock({ name: programName })
-const saleOrderMock = new SaleOrderMock({ price: CONST.price })
+const couponProgramMock = new CouponProgramModel({ name: programName })
+const saleOrderMock = new SaleOrderModel({ orderLines: [{ price: CONST.price }] })
 
 const page = new CouponProgramPage()
 const salePage = new SaleOrderPage()

@@ -1,26 +1,15 @@
-import { PartnerMock, SaleOrderMock } from "../../support/mock";
 import { cy_wrap } from "../../support/utils";
 import { SaleOrderPage } from "../../support/page";
-import { SaleOrderFactory } from "../../support/mock_factory";
+import { PartnerModel, SaleOrderModel } from '../../support/model';
 
-// const saleMock1 = new SaleOrderMock({ state: 'Cancelled' })
-// const saleMock2 = new SaleOrderMock({ state: 'Confirmed', stockQty: 1 })
-const partner = new PartnerMock()
-const saleMock3 = new SaleOrderMock({
-  config: {
-    orderLines: [{ qty: 1, price: 43 }],
-    partner: partner
-  },
-})
+const saleMock1 = new SaleOrderModel({ state: 'Cancelled', orderLines: [{}] })
+const saleMock2 = new SaleOrderModel({ state: 'Confirmed', orderLines: [{ stockQty: 1 }] })
+const partner = new PartnerModel()
 
 
 const page = new SaleOrderPage()
 
 describe('Sale Order In Stock Percentage', function () {
-  it.only('should test', function () {
-    saleMock3.generate()
-  });
-
   it('should display N/A in cancelled order', function () {
     cy_wrap(() => saleMock1.generate())
     page.navigate()
@@ -44,7 +33,7 @@ describe('Sale Order In Stock Percentage', function () {
   });
 
   before(() => {
-    // saleMock1.cleanup()
-    // saleMock2.cleanup()
+    saleMock1.cleanup()
+    saleMock2.cleanup()
   })
 });

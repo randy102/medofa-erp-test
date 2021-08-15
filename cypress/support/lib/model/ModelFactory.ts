@@ -1,11 +1,11 @@
-import { MockItem } from '../mock';
+import { IModel } from '../index';
 
-export abstract class MockFactory<Config> {
-  protected mockList: MockItem<Config>[] = []
+export abstract class ModelFactory<Option> {
+  protected mockList: IModel[] = []
 
-  constructor(configs: Partial<Config>[]) {
+  constructor(options: Partial<Option>[]) {
     const Mock = this.getMockClass()
-    for (const config of configs) {
+    for (const config of options) {
       this.mockList.push(new Mock(config))
     }
   }
@@ -29,13 +29,13 @@ export abstract class MockFactory<Config> {
     return this.mockList.length
   }
 
-  getMock(i: number): MockItem {
+  getMock(i: number): IModel {
     if (i >= this.length())
       return null
     return this.mockList[i]
   }
 
-  getMockById(id: number): MockItem {
+  getMockById(id: number): IModel {
     return this.mockList.find(mock => mock.getId() == id)
   }
 

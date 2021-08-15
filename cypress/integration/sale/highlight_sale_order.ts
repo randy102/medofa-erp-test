@@ -1,11 +1,10 @@
-import { PartnerMock, SaleOrderMock } from "../../support/mock";
-import { DistrictMock } from "../../support/mock/DistrictMock";
 import { cy_wrap } from "../../support/utils";
 import { SaleOrderPage } from "../../support/page";
+import { PartnerModel, SaleOrderModel, DistrictModel } from '../../support/model';
 
-const districtMock = new DistrictMock({ raw: { warning_covid: true } })
-const partnerMock = new PartnerMock({ depends: { district: districtMock } })
-const saleMock1 = new SaleOrderMock({ depends: { partner: partnerMock } })
+const districtMock = new DistrictModel({ covid: true })
+const partnerMock = new PartnerModel({ district: districtMock })
+const saleMock1 = new SaleOrderModel({ partner: partnerMock, orderLines: [{}] })
 
 const page = new SaleOrderPage()
 

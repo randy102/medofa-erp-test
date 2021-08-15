@@ -1,6 +1,7 @@
 import { Model } from './Model';
 import { FieldMetadata } from './FieldMetadata';
 import { FieldDefault } from './FieldDecorator';
+import { clone } from '../helper';
 
 export class SeedOption {
   fieldMetadata: FieldMetadata[]
@@ -27,7 +28,7 @@ export class SeedOption {
       const { FieldClass, defaultValue: rawDefaultVal, fieldName } = field
       const defaultValue = this.getDefaultValue(rawDefaultVal)
 
-      if (field.isNormal() && !this[fieldName]) {
+      if (field.isNormal() && !this[fieldName] && defaultValue) {
         this[fieldName] = defaultValue
       }
 
@@ -57,6 +58,20 @@ export class SeedOption {
     }
   }
 
+  async cleanupORecord() {
+    if (!this.fieldMetadata) return
+    for (const field of this.fieldMetadata) {
+      const { fieldName } = field
+      if (field.isM2O()) {
+        await (this[fieldName] as Model<any>).cleanup()
+      } else if (field.isO2M(this)) {
+        for (const opt of this[fieldName]) {
+          await (opt as SeedOption).cleanupORecord()
+        }
+      }
+    }
+  }
+
   getSeedData() {
     const data = {}
     for (const field of this.fieldMetadata) {
@@ -74,13 +89,15 @@ export class SeedOption {
   }
 
   private static formatO2MData(record: any[]) {
-    return [record.map(r => [0, 0, r])]
+    return record.map(r => [0, 0, r])
   }
 
   private getDefaultValue(def: FieldDefault) {
     if (typeof def === 'function') {
-      return def(this)
+      return def(clone(this))
     }
     return def
   }
+
+
 }

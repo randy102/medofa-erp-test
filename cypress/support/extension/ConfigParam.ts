@@ -1,4 +1,5 @@
-import { OdooRPC } from "../utils";
+import { OdooRPC } from '../lib';
+
 
 export class ConfigParam {
   private rpc: OdooRPC

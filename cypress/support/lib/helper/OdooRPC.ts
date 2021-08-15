@@ -36,8 +36,8 @@ export class OdooRPC {
     return this.call(model, 'create', val)
   }
 
-  read(model, id, fields: string[] = []): Promise<any> {
-    return this.call(model, 'read', [+id], fields)
+  read(model, ids: number[], fields: string[] = []): Promise<any[]> {
+    return this.call(model, 'read', ids, fields)
   }
 
   write(model, id, val): Promise<void> {
@@ -45,7 +45,7 @@ export class OdooRPC {
   }
 
   archive(model, id): Promise<void> {
-    return this.write(model, id, {'active': false})
+    return this.write(model, id, { 'active': false })
   }
 
   unlink(model, id): Promise<void> {
@@ -84,13 +84,14 @@ export class OdooRPC {
 
    private execute(model, method, args){
     return new Promise((resolve, reject) => {
+      console.log(`Execute: ${model}.${method}\nParams: ${JSON.stringify(args)}`)
       OdooRPC.odoo.execute_kw(model, method, args, (err, value) => {
         if (err) {
           console.log(err)
           reject(err)
         } else {
           resolve(value)
-          console.log(`Executed: ${model}.${method}\nParams: ${JSON.stringify(args)}\n=> ${JSON.stringify(value)}`)
+          console.log(`Return => ${JSON.stringify(value)}`)
         }
       });
     })

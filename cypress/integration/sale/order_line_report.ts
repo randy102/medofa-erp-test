@@ -1,7 +1,8 @@
-import { ProductMock, PurchaseOrderMock } from '../../support/mock';
-import { SaleOrderFactory } from '../../support/mock_factory';
+import { SaleOrderFactory } from '../../support/model_factory';
 import { OrderLinePage } from '../../support/page';
-import { cy_wrap, randomInt } from "../../support/utils";
+import { cy_wrap } from "../../support/utils";
+import { ProductModel, PurchaseOrderModel } from '../../support/model';
+import { randomInt } from '../../support/lib';
 
 const CONST = {
   mainKhdQty: randomInt(10, 30),
@@ -16,7 +17,7 @@ const CONST = {
 }
 const page = new OrderLinePage()
 
-const productMock = new ProductMock({
+const productMock = new ProductModel({
   mainHdQty: CONST.mainHdQty,
   mainKhdQty: CONST.mainKhdQty,
   inboundQty: CONST.inboundQty,
@@ -24,14 +25,14 @@ const productMock = new ProductMock({
 })
 
 const mock = new SaleOrderFactory([
-  {depends: {product: productMock}, state: 'Received', qty: CONST.receivedQty},
-  {depends: {product: productMock}, state: 'Confirmed', qty: CONST.saleConfirmedQty},
-  {depends: {product: productMock}, state: 'Cancelled', qty: CONST.cancelledQty},
-  {depends: {product: productMock}, state: 'Progressing', qty: CONST.progressingQty},
+  { orderLines: [{ product: productMock, qty: CONST.receivedQty }], state: 'Received' },
+  { orderLines: [{ product: productMock, qty: CONST.saleConfirmedQty }], state: 'Confirmed' },
+  { orderLines: [{ product: productMock, qty: CONST.cancelledQty }], state: 'Cancelled' },
+  { orderLines: [{ product: productMock, qty: CONST.progressingQty }], state: 'Progressing' },
 ])
-const purchaseMock = new PurchaseOrderMock({
-  depends: {product: productMock},
-  state: 'Confirmed', qty: CONST.purchaseConfirmedQty
+const purchaseMock = new PurchaseOrderModel({
+  orderLines: [{ product: productMock, qty: CONST.purchaseConfirmedQty }],
+  state: 'Confirmed',
 })
 
 describe('Order Line Report', function () {
@@ -52,7 +53,7 @@ describe('Order Line Report', function () {
   });
 
   it.only('should display product quantities correctly', function () {
-    cy_wrap(() => productMock.get(['default_code'])).then(({default_code}) => {
+    cy_wrap(() => productMock.get(['default_code'])).then(({ default_code }) => {
       page._inputSearch(default_code, 'Product')
       page._findTreeGroupRow(default_code).should('be.visible')
 

@@ -1,15 +1,16 @@
-import { CouponProgramMock, PartnerMock, SaleOrderMock } from "../../support/mock";
 import { SettingPage } from "../../support/page/SettingPage";
-import { cy_wrap, OdooRPC, randomString } from "../../support/utils";
+import { cy_wrap } from "../../support/utils";
 import { ConfigParam } from "../../support/extension";
 import { CouponProgramPage } from "../../support/page";
+import { PartnerModel, SaleOrderModel, CouponProgramModel } from '../../support/model';
+import { OdooRPC, randomString } from '../../support/lib';
 
 const PROGRAM_NAME = randomString()
 
-const programMock = new CouponProgramMock({ name: PROGRAM_NAME })
-const partnerMock = new PartnerMock({ customerRefId: OdooRPC.getPartnerId() })
-const saleMock1 = new SaleOrderMock({ depends: { partner: partnerMock }, state: 'Delivered', stockQty: 1 })
-const saleMock2 = new SaleOrderMock({ depends: { partner: partnerMock }, state: 'Delivered', stockQty: 1 })
+const programMock = new CouponProgramModel({ name: PROGRAM_NAME })
+const partnerMock = new PartnerModel({ customerRefId: OdooRPC.getPartnerId() })
+const saleMock1 = new SaleOrderModel({ partner: partnerMock, state: 'Delivered', orderLines: [{ stockQty: 1 }] })
+const saleMock2 = new SaleOrderModel({ partner: partnerMock, state: 'Delivered', orderLines: [{ stockQty: 1 }] })
 
 const settingPage = new SettingPage()
 const programPage = new CouponProgramPage()
