@@ -1,4 +1,5 @@
 import { BasePage } from "./BasePage";
+import Chainable = Cypress.Chainable;
 
 export class SettingPage extends BasePage {
   navigate() {
@@ -11,12 +12,14 @@ export class SettingPage extends BasePage {
     cy.contains('.title', 'Settings').should('be.visible')
   }
 
-  navigateTab(name: string) {
-    cy.contains('.settings_tab>.tab', name).click()
+  navigateTab(name: string): Chainable {
+    return cy.contains('.settings_tab>.tab', name).click()
   }
 
   save() {
     this._clickButton('Save', 'execute')
+    cy.wait(5000)
+    this.ensurePageLoaded()
   }
 
 }

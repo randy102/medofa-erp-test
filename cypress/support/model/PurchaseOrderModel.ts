@@ -5,7 +5,7 @@ import { PartnerModel } from './PartnerModel';
 
 
 export class PurchaseLineOption extends SeedOption {
-  @Field({ key: 'product_id', cls: ProductModel })
+  @Field({ key: 'product_id', cls: ProductModel, auto: true })
   product: ORecord<ProductModel>
 
   @Field({ key: 'product_qty', def: 1 })
@@ -25,7 +25,7 @@ export class PurchaseLineOption extends SeedOption {
 }
 
 export class PurchaseOrderOption extends SeedOption {
-  @Field({ key: 'partner_id', def: OdooRPC.getPartnerId() })
+  @Field({ key: 'partner_id', def: OdooRPC.getPartnerId(), auto: true })
   partner: ORecord<PartnerModel>
 
   @Field({ key: 'order_line', cls: PurchaseLineOption })

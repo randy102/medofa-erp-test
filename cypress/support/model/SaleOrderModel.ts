@@ -4,7 +4,7 @@ import { PartnerModel } from './PartnerModel';
 
 
 export class OrderLine extends SeedOption {
-  @Field({ key: 'product_id', cls: ProductModel })
+  @Field({ key: 'product_id', cls: ProductModel, auto: true })
   product: ORecord<ProductModel>
 
   @Field({ key: 'price_unit', def: 10000 })
@@ -17,7 +17,7 @@ export class OrderLine extends SeedOption {
 }
 
 export class SaleOrderOption extends SeedOption {
-  @Field({ key: 'partner_id', cls: PartnerModel, def: OdooRPC.getPartnerId() })
+  @Field({ key: 'partner_id', cls: PartnerModel, def: OdooRPC.getPartnerId(), auto: true })
   partner: ORecord<PartnerModel>
 
   @Field({ key: 'order_line', cls: OrderLine })
@@ -110,7 +110,7 @@ export class SaleOrderModel extends SeedModel<SaleOrderOption> {
 
   async validatePicking(id: number) {
     const immediateTransferId = await this.rpc.create('stock.immediate.transfer', { pick_ids: [[4, id]] })
-    await this.rpc.call('stock.immediate.transfer', 'process', [immediateTransferId])
+    await this.rpc.call('stock.immediate.transfer', 'process', immediateTransferId)
   }
 
   async confirm(): Promise<void> {

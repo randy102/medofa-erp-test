@@ -30,9 +30,7 @@ describe('Generate referring coupon for customer', function () {
       settingPage._selectMany2one('medofa_customer_referring_program', data['name'])
     })
     settingPage.save()
-    cy.wait(5000)
 
-    settingPage.ensurePageLoaded()
     cy_wrap(() => configParam.get('medofa_marketing.customer_referring_program')).then(data => {
       expect(parseInt(data)).equal(programMock.getId())
     })

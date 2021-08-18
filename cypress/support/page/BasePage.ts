@@ -55,6 +55,10 @@ export abstract class BasePage {
     cy.get('button.o_list_button_add').click()
   }
 
+  _switchTreeView() {
+    cy.get('button.o_cp_switch_list').click()
+  }
+
 
   /**
    * @description Form View
@@ -145,9 +149,14 @@ export abstract class BasePage {
     return cy.get('div.o_searchview_input_container')
   }
 
-  _inputSearch(keyword, type){
+  /**
+   * To input search bar
+   * @param keyword keyword to search
+   * @param type type of suggestion to pick
+   */
+  _inputSearch(keyword, type) {
     cy.get('.o_searchview_input_container input[type="text"]').type(keyword)
-    cy.contains('.o_searchview_input_container .o_searchview_autocomplete a',type).click()
+    cy.contains('.o_searchview_input_container .o_searchview_autocomplete a', type).click()
   }
 
   private static getFieldTreeCss(css, field) {
