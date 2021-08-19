@@ -2,8 +2,9 @@ import { SettingPage } from '../../support/page/SettingPage';
 import { ConfigParam } from '../../support/extension';
 import { cy_wrap } from '../../support/utils';
 import { randomInt } from 'odoo-seeder';
-import { PartnerModel, SaleOrderModel } from '../../support/model';
+import { PartnerModel, ProductModel } from '../../support/model';
 import { PartnerPage } from '../../support/page/PartnerPage';
+import { SaleOrderFactory } from '../../support/model_factory';
 
 const TIER: { [key: string]: [number, string, string, string] } = {
   noneReward: [randomInt(1, 10) / 10, 'medofa_none_reward', 'medofa_loyalty.none_tier_reward', 'None'],
@@ -17,14 +18,26 @@ const [pReward, , , pName] = Object.values(TIER)[randomInt(0, 4)]
 const CONST = {
   amountTotal: randomInt(10000, 1000000)
 }
-const expectedPoint = Math.floor(CONST.amountTotal * pReward / 100)
+const salePrice1 = randomInt(10000, CONST.amountTotal)
+const salePrice2 = CONST.amountTotal - salePrice1
+
+const expectedPoint1 = Math.floor(salePrice1 * pReward / 100)
+const expectedPoint2 = Math.floor(salePrice2 * pReward / 100)
 
 const config = new ConfigParam()
 const partner = new PartnerModel({ loyaltyRank: pName.toLowerCase() })
-const saleOrder = new SaleOrderModel({
-  partner,
-  state: 'Delivered',
-  orderLines: [{ price: CONST.amountTotal, stockQty: 1 }]
+const product = new ProductModel({ mainHdQty: 2 })
+const saleOrder = new SaleOrderFactory({
+  'sale1': {
+    partner,
+    state: 'Delivered',
+    orderLines: [{ product, price: salePrice1, stockQty: 1 }]
+  },
+  'sale2': {
+    partner,
+    state: 'Delivered',
+    orderLines: [{ product, price: salePrice2, stockQty: 1 }]
+  }
 })
 
 const settingPage = new SettingPage()
@@ -57,17 +70,31 @@ describe('Loyalty Point', function () {
 
     partnerPage._clickTab('Loyalty')
     partnerPage._findFormField('loyalty_rank').should('contain', pName)
-    partnerPage._findFormField('loyalty_point_sum').invoke('text').then((point: string) => {
-      const formatPoint = parseInt(point.replace(',', ''))
-      expect(formatPoint).to.eq(expectedPoint)
-    })
 
-    cy_wrap(() => saleOrder.get(['name'])).then(({ name }) => {
+
+    cy_wrap(() => saleOrder.getModel('sale1').get(['name'])).then(({ name }) => {
       partnerPage._findTreeColumn(`Đơn hàng #${name}`, 'type', 'loyalty_history').should('contain', 'Auto')
       partnerPage._findTreeColumn(`Đơn hàng #${name}`, 'quantity', 'loyalty_history').invoke('text').then((point) => {
         const formatPoint = parseInt(point.replace(',', ''))
-        expect(formatPoint).to.eq(expectedPoint)
+        expect(formatPoint).to.eq(expectedPoint1)
       })
     })
+
+    cy_wrap(() => saleOrder.getModel('sale2').get(['name'])).then(({ name }) => {
+      partnerPage._findTreeColumn(`Đơn hàng #${name}`, 'type', 'loyalty_history').should('contain', 'Auto')
+      partnerPage._findTreeColumn(`Đơn hàng #${name}`, 'quantity', 'loyalty_history').invoke('text').then((point) => {
+        const formatPoint = parseInt(point.replace(',', ''))
+        expect(formatPoint).to.eq(expectedPoint2)
+      })
+    })
+
+    partnerPage._findFormField('loyalty_point_sum').invoke('text').then((point: string) => {
+      const formatPoint = parseInt(point.replace(',', ''))
+      expect(formatPoint).to.eq(expectedPoint1 + expectedPoint2)
+    })
   });
+
+  after(() => {
+    saleOrder.cleanup()
+  })
 });

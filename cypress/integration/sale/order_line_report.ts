@@ -24,12 +24,12 @@ const productMock = new ProductModel({
   scrapQty: CONST.scrapQty
 })
 
-const mock = new SaleOrderFactory([
-  { orderLines: [{ product: productMock, qty: CONST.receivedQty }], state: 'Received' },
-  { orderLines: [{ product: productMock, qty: CONST.saleConfirmedQty }], state: 'Confirmed' },
-  { orderLines: [{ product: productMock, qty: CONST.cancelledQty }], state: 'Cancelled' },
-  { orderLines: [{ product: productMock, qty: CONST.progressingQty }], state: 'Progressing' },
-])
+const mock = new SaleOrderFactory({
+  'sale1': { orderLines: [{ product: productMock, qty: CONST.receivedQty }], state: 'Received' },
+  'sale2': { orderLines: [{ product: productMock, qty: CONST.saleConfirmedQty }], state: 'Confirmed' },
+  'sale3': { orderLines: [{ product: productMock, qty: CONST.cancelledQty }], state: 'Cancelled' },
+  'sale4': { orderLines: [{ product: productMock, qty: CONST.progressingQty }], state: 'Progressing' },
+})
 const purchaseMock = new PurchaseOrderModel({
   orderLines: [{ product: productMock, qty: CONST.purchaseConfirmedQty }],
   state: 'Confirmed',

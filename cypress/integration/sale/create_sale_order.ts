@@ -23,7 +23,7 @@ describe('Create Sale Order', function () {
     })
     page._inputTree('product_uom_qty', 0, '5')
     page._clickSaveButton()
-    cy.get('button.o_form_button_edit').should('be.visible')
+
     page.getStateButton(SaleState.DRAFT).should('have.attr', 'aria-checked', 'true')
 
     cy.get('div.oe_title span[name="name"]').invoke('text').as('order_name').then(order_name => {

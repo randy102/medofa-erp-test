@@ -47,7 +47,7 @@ export abstract class BasePage {
   }
 
   _clickActionButton(title: string) {
-    cy.contains('button.o_dropdown_toggler_btn', 'Action').as('action_button').click()
+    cy.contains('button.o_dropdown_toggler_btn', 'Action').as('action_button').parent().click()
     cy.get('@action_button').next().contains('a[role="menuitem"]', title).click()
   }
 
@@ -59,12 +59,17 @@ export abstract class BasePage {
     cy.get('button.o_cp_switch_list').click()
   }
 
+  _clickConfirmOk() {
+    cy.contains('.modal-content button', 'Ok').click()
+  }
+
 
   /**
    * @description Form View
    */
   _clickSaveButton() {
     cy.get('button.o_form_button_save').click()
+    cy.get('button.o_form_button_edit').should('be.visible')
   }
 
   _clickTab(title: string) {
@@ -87,6 +92,10 @@ export abstract class BasePage {
 
   _findFormField(name): Chainable {
     return cy.get(`.o_field_widget[name="${name}"]`)
+  }
+
+  _getFormRibbon(): Chainable {
+    return cy.get('.ribbon>span')
   }
 
   /**
