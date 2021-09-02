@@ -49,10 +49,6 @@ export class ProductModel extends SeedModel<ProductOption> {
     }
   }
 
-  protected async shouldCleanup(option: ProductOption): Promise<boolean> {
-    return !this.initQty
-  }
-
   async generateMainKhdQty(qty: number, lot?: number | string) {
     const mainKHDLocationId = await GlobalCache.get(CK.MAIN_STOCK_KHD_LOCATION_ID)
     await this.generateLotQuantity(mainKHDLocationId, qty, lot)

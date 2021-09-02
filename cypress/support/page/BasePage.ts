@@ -164,6 +164,7 @@ export abstract class BasePage {
    * @param type type of suggestion to pick
    */
   _inputSearch(keyword, type) {
+    cy.wait(1000)
     cy.get('.o_searchview_input_container input[type="text"]').type(keyword)
     cy.contains('.o_searchview_input_container .o_searchview_autocomplete a', type).click()
   }

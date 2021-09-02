@@ -15,9 +15,15 @@ export class SaleOrderPage extends BasePage{
     this._clickMenu('sale.menu_sale_quotations')
   }
 
-  getStateButton(state: SaleState){
+  getStateButton(state: SaleState) {
     return cy.get(`button[data-value="${state}"]`)
   }
 
+  applyCouponCode(code: string) {
+    this._clickButton('Coupon')
+    this._input('coupon_code', code)
+    this._clickButton('Apply')
+    cy.wait(5000)
+  }
 
 }

@@ -3,6 +3,7 @@ import { OrderLinePage } from '../../support/page';
 import { cy_wrap } from "../../support/utils";
 import { ProductModel, PurchaseOrderModel } from '../../support/model';
 import { randomInt } from 'odoo-seeder';
+import { enterTest, leaveTest } from '../../support/utils/testMode';
 
 const CONST = {
   mainKhdQty: randomInt(10, 30),
@@ -37,6 +38,7 @@ const purchaseMock = new PurchaseOrderModel({
 
 describe('Order Line Report', function () {
   before(() => {
+    enterTest()
     cy_wrap(async () => {
       await mock.generate()
       await purchaseMock.generate()
@@ -66,8 +68,5 @@ describe('Order Line Report', function () {
     })
   });
 
-  after(() => {
-    mock.cleanup()
-    purchaseMock.cleanup(false)
-  })
+  after(() => leaveTest())
 });

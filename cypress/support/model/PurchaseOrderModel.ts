@@ -82,13 +82,4 @@ export class PurchaseOrderModel extends SeedModel<PurchaseOrderOption> {
     await this.call('button_cancel')
   }
 
-
-  protected async beforeCleanup(option: PurchaseOrderOption): Promise<void> {
-    await this.cancel()
-    if (option.state == 'Confirmed') {
-      const { picking_ids } = await this.get(['picking_ids'])
-      await this.rpc.unlink('stock.picking', picking_ids)
-    }
-  }
-
 }

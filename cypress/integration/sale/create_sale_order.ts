@@ -2,6 +2,7 @@ import { SaleOrderPage, SaleState } from '../../support/page';
 import { cy_wrap } from "../../support/utils";
 import { ProductModel } from '../../support/model';
 import { OdooRPC } from 'odoo-seeder';
+import { enterTest, leaveTest } from '../../support/utils/testMode';
 
 
 const productMock = new ProductModel()
@@ -10,6 +11,7 @@ const page = new SaleOrderPage()
 
 describe('Create Sale Order', function () {
   beforeEach(() => {
+    enterTest()
     page.navigate()
   })
 
@@ -99,4 +101,5 @@ describe('Create Sale Order', function () {
     page._clickButton('Ok')
     page._findTreeRow(this.order_name).should('not.exist')
   });
+  after(() => leaveTest())
 });

@@ -1,6 +1,7 @@
 import { cy_wrap } from "../../support/utils";
 import { SaleOrderPage } from "../../support/page";
 import { PartnerModel, SaleOrderModel, DistrictModel } from '../../support/model';
+import { enterTest, leaveTest } from '../../support/utils/testMode';
 
 const districtMock = new DistrictModel({ covid: true })
 const partnerMock = new PartnerModel({ district: districtMock })
@@ -9,6 +10,8 @@ const saleMock1 = new SaleOrderModel({ partner: partnerMock, orderLines: [{}] })
 const page = new SaleOrderPage()
 
 describe('Highlight Sale Order', function () {
+  before(() => enterTest())
+
   it('should highlight order has delivery district affected by covid', function () {
     cy_wrap(() => saleMock1.generate())
     page.navigate()
@@ -18,8 +21,5 @@ describe('Highlight Sale Order', function () {
     })
   });
 
-  after(() => {
-    console.log('Clean')
-    saleMock1.cleanup()
-  })
+  after(() => leaveTest())
 });

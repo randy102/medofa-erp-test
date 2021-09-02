@@ -1,20 +1,30 @@
 import { CouponProgramPage, SaleOrderPage } from '../../support/page';
 import { cy_wrap } from "../../support/utils";
-import { SaleOrderModel, CouponProgramModel } from '../../support/model';
+import { SaleOrderModel, ProgramModel } from '../../support/model';
 import { randomString } from 'odoo-seeder';
+import { enterTest, leaveTest } from '../../support/utils/testMode';
 
 const CONST = {
   price: 10000
 }
 
 const programName = randomString()
-const couponProgramMock = new CouponProgramModel({ name: programName })
+const couponProgramMock = new ProgramModel({
+  name: programName,
+  type: 'coupon_program',
+  discountType: 'percentage',
+  percentage: 10
+})
 const saleOrderMock = new SaleOrderModel({ orderLines: [{ price: CONST.price }] })
 
 const page = new CouponProgramPage()
 const salePage = new SaleOrderPage()
 
 describe('Generate coupon with length and prefix', function () {
+  before(() => {
+    enterTest()
+  })
+
   it('should generate coupon code successfully', function () {
     cy_wrap(() => couponProgramMock.generate())
     page.navigate()
@@ -66,18 +76,10 @@ describe('Generate coupon with length and prefix', function () {
 
     cy_wrap(() => saleOrderMock.get(['name'])).then(data => {
       salePage._clickTreeItem(data['name'])
-      salePage._clickButton('Coupon')
-      salePage._input('coupon_code', this['coupon_code'])
-      salePage._clickButton('Apply')
-      cy.wait(5000)
+      salePage.applyCouponCode(this['coupon_code'])
       cy.contains(`Discount: ${programName}`).should('exist')
       cy.contains(-CONST.price * 0.1).should('exist')
     })
   });
-
-
-  after(() => {
-    saleOrderMock.cleanup()
-    couponProgramMock.cleanup()
-  })
+  after(() => leaveTest())
 });

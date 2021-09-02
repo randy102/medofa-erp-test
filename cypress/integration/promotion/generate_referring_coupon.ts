@@ -2,12 +2,13 @@ import { SettingPage } from "../../support/page/SettingPage";
 import { cy_wrap } from "../../support/utils";
 import { ConfigParam } from "../../support/extension";
 import { CouponProgramPage } from "../../support/page";
-import { PartnerModel, SaleOrderModel, CouponProgramModel } from '../../support/model';
+import { PartnerModel, SaleOrderModel, ProgramModel } from '../../support/model';
 import { OdooRPC, randomString } from 'odoo-seeder';
+import { enterTest, leaveTest } from '../../support/utils/testMode';
 
 const PROGRAM_NAME = randomString()
 
-const programMock = new CouponProgramModel({ name: PROGRAM_NAME })
+const programMock = new ProgramModel({ name: PROGRAM_NAME, type: 'coupon_program', discountType: 'percentage' })
 const partnerMock = new PartnerModel({ customerRefId: OdooRPC.getPartnerId() })
 const saleMock1 = new SaleOrderModel({ partner: partnerMock, state: 'Delivered', orderLines: [{ stockQty: 1 }] })
 const saleMock2 = new SaleOrderModel({ partner: partnerMock, state: 'Delivered', orderLines: [{ stockQty: 1 }] })
@@ -19,6 +20,7 @@ const configParam = new ConfigParam()
 
 describe('Generate referring coupon for customer', function () {
   before(() => {
+    enterTest()
     cy_wrap(() => programMock.generate())
   })
 
@@ -53,8 +55,5 @@ describe('Generate referring coupon for customer', function () {
     programPage.getNumberOfCoupon().should('contain', 1)
   });
 
-  after(() => {
-    programMock.cleanup()
-    saleMock1.cleanup(false)
-  })
+  after(() => leaveTest())
 });

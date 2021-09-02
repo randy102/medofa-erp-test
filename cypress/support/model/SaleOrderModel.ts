@@ -1,6 +1,6 @@
 import { Field, SeedModel, ModelConfig, MRecord, ORecord, OdooRPC, SeedOption } from 'odoo-seeder';
 import { ProductModel } from './ProductModel';
-import { PartnerModel } from './PartnerModel';
+import { PartnerModel, PartnerOption } from './PartnerModel';
 
 
 export class OrderLine extends SeedOption {
@@ -18,12 +18,14 @@ export class OrderLine extends SeedOption {
 
 export class SaleOrderOption extends SeedOption {
   @Field({ key: 'partner_id', cls: PartnerModel, def: OdooRPC.getPartnerId(), auto: true })
-  partner: ORecord<PartnerModel>
+  partner: ORecord<PartnerModel, PartnerOption>
 
   @Field({ key: 'order_line', cls: OrderLine })
   orderLines: MRecord<OrderLine>
 
   state: 'Received' | 'Confirmed' | 'Cancelled' | 'Progressing' | 'Delivering' | 'Delivered'
+
+  couponCode: string
 }
 
 export class SaleOrderModel extends SeedModel<SaleOrderOption> {
@@ -39,6 +41,9 @@ export class SaleOrderModel extends SeedModel<SaleOrderOption> {
   }
 
   async afterGenerate(option: SaleOrderOption): Promise<void> {
+    if (option.couponCode) {
+      await this.applyCouponCode(option.couponCode)
+    }
     switch (option.state) {
       case 'Received':
         await this.receive()
@@ -60,16 +65,9 @@ export class SaleOrderModel extends SeedModel<SaleOrderOption> {
     }
   }
 
-  protected async beforeCleanup(option: SaleOrderOption): Promise<void> {
-    await this.cancel()
-    if (option.state == "Confirmed") {
-      const { picking_ids } = await this.get(['picking_ids'])
-      await this.rpc.unlink('stock.picking', picking_ids)
-    }
-  }
-
-  protected async shouldCleanup(option: SaleOrderOption): Promise<boolean> {
-    return option.state != 'Progressing'
+  async applyCouponCode(code: string) {
+    this.ensureIdExisted()
+    await this.rpc.call('sale.coupon.apply.code', 'apply_code', this.getId(), code)
   }
 
   async processShip(): Promise<void> {

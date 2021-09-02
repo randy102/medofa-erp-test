@@ -5,6 +5,7 @@ import { randomInt } from 'odoo-seeder';
 import { PartnerModel, ProductModel } from '../../support/model';
 import { PartnerPage } from '../../support/page/PartnerPage';
 import { SaleOrderFactory } from '../../support/model_factory';
+import { enterTest, leaveTest } from '../../support/utils/testMode';
 
 const TIER: { [key: string]: [number, string, string, string] } = {
   noneReward: [randomInt(1, 10) / 10, 'medofa_none_reward', 'medofa_loyalty.none_tier_reward', 'None'],
@@ -44,6 +45,10 @@ const settingPage = new SettingPage()
 const partnerPage = new PartnerPage()
 
 describe('Loyalty Point', function () {
+  before(() => {
+    enterTest()
+  })
+
   it('should config member tiers reward successfully', function () {
     settingPage.navigate()
     settingPage.navigateTab('Medofa')
@@ -94,7 +99,5 @@ describe('Loyalty Point', function () {
     })
   });
 
-  after(() => {
-    saleOrder.cleanup()
-  })
+  after(() => leaveTest())
 });

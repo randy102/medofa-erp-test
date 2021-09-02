@@ -1,6 +1,7 @@
 import { cy_wrap } from "../../support/utils";
 import { SaleOrderPage } from "../../support/page";
 import { PartnerModel, SaleOrderModel } from '../../support/model';
+import { enterTest, leaveTest } from '../../support/utils/testMode';
 
 const saleMock1 = new SaleOrderModel({ state: 'Cancelled', orderLines: [{}] })
 const saleMock2 = new SaleOrderModel({ state: 'Confirmed', orderLines: [{ stockQty: 1 }] })
@@ -10,6 +11,9 @@ const partner = new PartnerModel()
 const page = new SaleOrderPage()
 
 describe('Sale Order In Stock Percentage', function () {
+  before(() => {
+    enterTest()
+  })
   it('should display N/A in cancelled order', function () {
     cy_wrap(() => saleMock1.generate())
     page.navigate()
@@ -32,8 +36,5 @@ describe('Sale Order In Stock Percentage', function () {
 
   });
 
-  before(() => {
-    saleMock1.cleanup()
-    saleMock2.cleanup()
-  })
+  after(() => leaveTest())
 });
