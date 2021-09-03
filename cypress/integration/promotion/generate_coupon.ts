@@ -21,9 +21,6 @@ const page = new CouponProgramPage()
 const salePage = new SaleOrderPage()
 
 describe('Generate coupon with length and prefix', function () {
-  before(() => {
-    enterTest()
-  })
 
   it('should generate coupon code successfully', function () {
     cy_wrap(() => couponProgramMock.generate())
@@ -81,5 +78,4 @@ describe('Generate coupon with length and prefix', function () {
       cy.contains(-CONST.price * 0.1).should('exist')
     })
   });
-  after(() => leaveTest())
 });

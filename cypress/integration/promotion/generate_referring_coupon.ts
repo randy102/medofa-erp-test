@@ -20,7 +20,6 @@ const configParam = new ConfigParam()
 
 describe('Generate referring coupon for customer', function () {
   before(() => {
-    enterTest()
     cy_wrap(() => programMock.generate())
   })
 
@@ -55,5 +54,4 @@ describe('Generate referring coupon for customer', function () {
     programPage.getNumberOfCoupon().should('contain', 1)
   });
 
-  after(() => leaveTest())
 });

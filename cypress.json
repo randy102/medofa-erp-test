@@ -1,4 +1,5 @@
 {
   "projectId": "gq1pxt",
-  "defaultCommandTimeout": 8000
+  "defaultCommandTimeout": 8000,
+  "experimentalInteractiveRunEvents": true
 }

@@ -11,9 +11,6 @@ const partner = new PartnerModel()
 const page = new SaleOrderPage()
 
 describe('Sale Order In Stock Percentage', function () {
-  before(() => {
-    enterTest()
-  })
   it('should display N/A in cancelled order', function () {
     cy_wrap(() => saleMock1.generate())
     page.navigate()
@@ -36,5 +33,4 @@ describe('Sale Order In Stock Percentage', function () {
 
   });
 
-  after(() => leaveTest())
 });

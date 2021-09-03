@@ -10,7 +10,6 @@ const saleMock1 = new SaleOrderModel({ partner: partnerMock, orderLines: [{}] })
 const page = new SaleOrderPage()
 
 describe('Highlight Sale Order', function () {
-  before(() => enterTest())
 
   it('should highlight order has delivery district affected by covid', function () {
     cy_wrap(() => saleMock1.generate())
@@ -21,5 +20,4 @@ describe('Highlight Sale Order', function () {
     })
   });
 
-  after(() => leaveTest())
 });

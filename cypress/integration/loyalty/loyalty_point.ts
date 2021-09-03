@@ -45,10 +45,6 @@ const settingPage = new SettingPage()
 const partnerPage = new PartnerPage()
 
 describe('Loyalty Point', function () {
-  before(() => {
-    enterTest()
-  })
-
   it('should config member tiers reward successfully', function () {
     settingPage.navigate()
     settingPage.navigateTab('Medofa')
@@ -98,6 +94,4 @@ describe('Loyalty Point', function () {
       expect(formatPoint).to.eq(expectedPoint1 + expectedPoint2)
     })
   });
-
-  after(() => leaveTest())
 });

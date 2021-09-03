@@ -38,7 +38,6 @@ const purchaseMock = new PurchaseOrderModel({
 
 describe('Order Line Report', function () {
   before(() => {
-    enterTest()
     cy_wrap(async () => {
       await mock.generate()
       await purchaseMock.generate()
@@ -68,5 +67,4 @@ describe('Order Line Report', function () {
     })
   });
 
-  after(() => leaveTest())
 });

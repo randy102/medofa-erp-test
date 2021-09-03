@@ -45,10 +45,6 @@ const salePage = new SaleOrderPage()
 const partnerPage = new PartnerPage()
 
 describe('Loyalty Program', function () {
-  before(() => {
-    enterTest()
-  })
-
   it('should create loyalty program successfully', function () {
     page.navigate()
     page._clickCreateButton()
@@ -144,6 +140,4 @@ describe('Loyalty Program', function () {
       expect(formatPoint).to.eq(expectedLowerPoint + CONST.programReward)
     })
   });
-
-  after(() => leaveTest())
 });

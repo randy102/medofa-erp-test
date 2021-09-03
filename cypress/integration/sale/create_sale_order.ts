@@ -11,7 +11,6 @@ const page = new SaleOrderPage()
 
 describe('Create Sale Order', function () {
   beforeEach(() => {
-    enterTest()
     page.navigate()
   })
 
@@ -101,5 +100,5 @@ describe('Create Sale Order', function () {
     page._clickButton('Ok')
     page._findTreeRow(this.order_name).should('not.exist')
   });
-  after(() => leaveTest())
+
 });

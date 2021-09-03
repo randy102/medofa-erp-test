@@ -13,7 +13,7 @@
 // the project's config changing)
 
 import { config } from 'dotenv';
-
+import { enterTest, leaveTest } from '../support/utils/testMode';
 /**
  * @type {Cypress.PluginConfig}
  */
@@ -28,5 +28,25 @@ module.exports = (on, config) => {
   config.env.erpPort = +process.env.ERP_PORT
   config.env.erpPartnerId = +process.env.PARTNER_ID
   config.env.erpPartnerName = process.env.PARTNER_NAME
+
+  on('before:run', (details) => {
+    return enterTest()
+  })
+
+  on('before:spec', (spec) => {
+    if ('specFilter' in spec)
+      return enterTest()
+  })
+
+  on('after:run', (results) => {
+    return leaveTest()
+  })
+
+  on('after:spec', (spec, results) => {
+    if (!results)
+      return leaveTest()
+  })
+
   return config
 }
+
