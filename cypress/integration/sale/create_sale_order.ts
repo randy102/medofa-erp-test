@@ -1,8 +1,7 @@
 import { SaleOrderPage, SaleState } from '../../support/page';
-import { cy_wrap } from "../../support/utils";
+import { cy_sync } from "../../support/utils";
 import { ProductModel } from '../../support/model';
 import { OdooRPC } from 'odoo-seeder';
-import { enterTest, leaveTest } from '../../support/utils/testMode';
 
 
 const productMock = new ProductModel()
@@ -15,11 +14,11 @@ describe('Create Sale Order', function () {
   })
 
   it('should create order', function () {
-    cy_wrap(() => productMock.generate())
+    cy_sync(() => productMock.generate())
     page._clickCreateButton()
     page._selectMany2one('partner_id', OdooRPC.getPartnerName())
     page._clickLinkText('Add a product')
-    cy_wrap(() => productMock.get(['default_code'])).then(data => {
+    cy_sync(() => productMock.get(['default_code'])).then(data => {
       page._selectTreeMany2one('product_id', 0, data['default_code'])
     })
     page._inputTree('product_uom_qty', 0, '5')
@@ -59,7 +58,7 @@ describe('Create Sale Order', function () {
   });
 
   it('should confirm order successfully when product has enough stock', function () {
-    cy_wrap(() => productMock.generateMainKhdQty(5))
+    cy_sync(() => productMock.generateMainKhdQty(5))
     page._clickTreeItem(this.order_name)
 
     page._clickButton('Confirm', 'action_confirm_with_check_stock')

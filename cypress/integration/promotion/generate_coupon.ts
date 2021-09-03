@@ -1,8 +1,7 @@
 import { CouponProgramPage, SaleOrderPage } from '../../support/page';
-import { cy_wrap } from "../../support/utils";
+import { cy_sync } from "../../support/utils";
 import { SaleOrderModel, ProgramModel } from '../../support/model';
 import { randomString } from 'odoo-seeder';
-import { enterTest, leaveTest } from '../../support/utils/testMode';
 
 const CONST = {
   price: 10000
@@ -23,7 +22,7 @@ const salePage = new SaleOrderPage()
 describe('Generate coupon with length and prefix', function () {
 
   it('should generate coupon code successfully', function () {
-    cy_wrap(() => couponProgramMock.generate())
+    cy_sync(() => couponProgramMock.generate())
     page.navigate()
     page._clickTreeItem(programName)
 
@@ -68,10 +67,10 @@ describe('Generate coupon with length and prefix', function () {
   });
 
   it('should apply code to sale order successfully', function () {
-    cy_wrap(() => saleOrderMock.generate())
+    cy_sync(() => saleOrderMock.generate())
     salePage.navigate()
 
-    cy_wrap(() => saleOrderMock.get(['name'])).then(data => {
+    cy_sync(() => saleOrderMock.get(['name'])).then(data => {
       salePage._clickTreeItem(data['name'])
       salePage.applyCouponCode(this['coupon_code'])
       cy.contains(`Discount: ${programName}`).should('exist')

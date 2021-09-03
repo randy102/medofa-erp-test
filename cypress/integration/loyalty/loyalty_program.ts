@@ -2,10 +2,9 @@ import { randomString, randomInt } from 'odoo-seeder'
 import { LoyaltyProgramPage } from '../../support/page/LoyaltyProgramPage';
 import { PartnerModel, ProgramModel, SaleOrderModel } from '../../support/model';
 import { SaleOrderPage } from '../../support/page';
-import { cy_wrap } from '../../support/utils';
+import { cy_sync } from '../../support/utils';
 import { ConfigParam } from '../../support/extension';
 import { PartnerPage } from '../../support/page/PartnerPage';
-import { enterTest, leaveTest } from '../../support/utils/testMode';
 
 const CONST = {
   programName: randomString(),
@@ -70,10 +69,10 @@ describe('Loyalty Program', function () {
   });
 
   it('should apply loyalty program on order line that have price equals 0', function () {
-    cy_wrap(() => Promise.all([highSale.generate(), program.generate()]))
+    cy_sync(() => Promise.all([highSale.generate(), program.generate()]))
     salePage.navigate()
 
-    cy_wrap(() => highSale.get(['name'])).then(({ name }) => {
+    cy_sync(() => highSale.get(['name'])).then(({ name }) => {
       salePage._clickTreeItem(name)
       salePage.applyCouponCode(CONST.programCode)
       salePage._findTreeRow(`Loyalty: ${CONST.codeProgramName}`, 'order_line').should('exist')
@@ -82,7 +81,7 @@ describe('Loyalty Program', function () {
   });
 
   it('should add tier reward point if program point is lower than tier point', function () {
-    cy_wrap(async () => {
+    cy_sync(async () => {
       await config.set('medofa_loyalty.silver_tier_reward', CONST.silverReward)
       await highSale.processDelivery()
     })
@@ -90,7 +89,7 @@ describe('Loyalty Program', function () {
     partnerPage.navigate()
     partnerPage._switchTreeView()
 
-    cy_wrap(() => partner.getOption()).then(option => {
+    cy_sync(() => partner.getOption()).then(option => {
       partnerPage._inputSearch(option.name, 'Name')
       partnerPage._clickTreeItem(option.name)
     })
@@ -98,7 +97,7 @@ describe('Loyalty Program', function () {
     partnerPage._clickTab('Loyalty')
     partnerPage._findFormField('loyalty_rank').should('contain', 'Silver')
 
-    cy_wrap(() => highSale.get(['name'])).then(({ name }) => {
+    cy_sync(() => highSale.get(['name'])).then(({ name }) => {
       partnerPage._findTreeColumn(`Đơn hàng #${name}`, 'quantity', 'loyalty_history').invoke('text').then((point) => {
         const formatPoint = parseInt(point.replace(',', ''))
         expect(formatPoint).to.eq(expectedLowerPoint)
@@ -112,7 +111,7 @@ describe('Loyalty Program', function () {
   });
 
   it('should add program reward point if program point is higher than tier point', function () {
-    cy_wrap(async () => {
+    cy_sync(async () => {
       await config.set('medofa_loyalty.silver_tier_reward', CONST.silverReward)
       await lowSale.generate()
     })
@@ -120,7 +119,7 @@ describe('Loyalty Program', function () {
     partnerPage.navigate()
     partnerPage._switchTreeView()
 
-    cy_wrap(() => partner.getOption()).then(option => {
+    cy_sync(() => partner.getOption()).then(option => {
       partnerPage._inputSearch(option.name, 'Name')
       partnerPage._clickTreeItem(option.name)
     })
@@ -128,7 +127,7 @@ describe('Loyalty Program', function () {
     partnerPage._clickTab('Loyalty')
     partnerPage._findFormField('loyalty_rank').should('contain', 'Silver')
 
-    cy_wrap(() => lowSale.get(['name'])).then(({ name }) => {
+    cy_sync(() => lowSale.get(['name'])).then(({ name }) => {
       partnerPage._findTreeColumn(`Đơn hàng #${name}`, 'quantity', 'loyalty_history').invoke('text').then((point) => {
         const formatPoint = parseInt(point.replace(',', ''))
         expect(formatPoint).to.eq(CONST.programReward)

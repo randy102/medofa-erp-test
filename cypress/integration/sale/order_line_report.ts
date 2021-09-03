@@ -1,9 +1,8 @@
 import { SaleOrderFactory } from '../../support/model_factory';
 import { OrderLinePage } from '../../support/page';
-import { cy_wrap } from "../../support/utils";
+import { cy_sync } from "../../support/utils";
 import { ProductModel, PurchaseOrderModel } from '../../support/model';
 import { randomInt } from 'odoo-seeder';
-import { enterTest, leaveTest } from '../../support/utils/testMode';
 
 const CONST = {
   mainKhdQty: randomInt(10, 30),
@@ -38,7 +37,7 @@ const purchaseMock = new PurchaseOrderModel({
 
 describe('Order Line Report', function () {
   before(() => {
-    cy_wrap(async () => {
+    cy_sync(async () => {
       await mock.generate()
       await purchaseMock.generate()
     })
@@ -54,7 +53,7 @@ describe('Order Line Report', function () {
   });
 
   it.only('should display product quantities correctly', function () {
-    cy_wrap(() => productMock.get(['default_code'])).then(({ default_code }) => {
+    cy_sync(() => productMock.get(['default_code'])).then(({ default_code }) => {
       page._inputSearch(default_code, 'Product')
       page._findTreeGroupRow(default_code).should('be.visible')
 

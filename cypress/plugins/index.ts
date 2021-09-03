@@ -30,7 +30,8 @@ module.exports = (on, config) => {
   config.env.erpPartnerName = process.env.PARTNER_NAME
 
   on('before:run', (details) => {
-    return enterTest()
+    if (details.specs)
+      return enterTest()
   })
 
   on('before:spec', (spec) => {

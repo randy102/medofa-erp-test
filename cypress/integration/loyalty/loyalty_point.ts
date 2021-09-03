@@ -1,6 +1,6 @@
 import { SettingPage } from '../../support/page/SettingPage';
 import { ConfigParam } from '../../support/extension';
-import { cy_wrap } from '../../support/utils';
+import { cy_sync } from '../../support/utils';
 import { randomInt } from 'odoo-seeder';
 import { PartnerModel, ProductModel } from '../../support/model';
 import { PartnerPage } from '../../support/page/PartnerPage';
@@ -54,17 +54,17 @@ describe('Loyalty Point', function () {
     settingPage.save()
 
     for (const [percent, , key] of Object.values(TIER)) {
-      cy_wrap(() => config.get(key)).then(result => {
+      cy_sync(() => config.get(key)).then(result => {
         expect(parseFloat(result)).eq(percent)
       })
     }
   });
 
   it('should add point to customer after order is delivered', function () {
-    cy_wrap(() => saleOrder.generate())
+    cy_sync(() => saleOrder.generate())
     partnerPage.navigate()
     partnerPage._switchTreeView()
-    cy_wrap(() => partner.getOption()).then(option => {
+    cy_sync(() => partner.getOption()).then(option => {
       partnerPage._inputSearch(option.name, 'Name')
       partnerPage._clickTreeItem(option.name)
     })
@@ -73,7 +73,7 @@ describe('Loyalty Point', function () {
     partnerPage._findFormField('loyalty_rank').should('contain', pName)
 
 
-    cy_wrap(() => saleOrder.getModel('sale1').get(['name'])).then(({ name }) => {
+    cy_sync(() => saleOrder.getModel('sale1').get(['name'])).then(({ name }) => {
       partnerPage._findTreeColumn(`Đơn hàng #${name}`, 'type', 'loyalty_history').should('contain', 'Auto')
       partnerPage._findTreeColumn(`Đơn hàng #${name}`, 'quantity', 'loyalty_history').invoke('text').then((point) => {
         const formatPoint = parseInt(point.replace(',', ''))
@@ -81,7 +81,7 @@ describe('Loyalty Point', function () {
       })
     })
 
-    cy_wrap(() => saleOrder.getModel('sale2').get(['name'])).then(({ name }) => {
+    cy_sync(() => saleOrder.getModel('sale2').get(['name'])).then(({ name }) => {
       partnerPage._findTreeColumn(`Đơn hàng #${name}`, 'type', 'loyalty_history').should('contain', 'Auto')
       partnerPage._findTreeColumn(`Đơn hàng #${name}`, 'quantity', 'loyalty_history').invoke('text').then((point) => {
         const formatPoint = parseInt(point.replace(',', ''))
